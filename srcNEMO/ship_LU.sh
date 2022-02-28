@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # directory to be shipped
-TARGET_DIR=LU_routines
-TARGET_PATH=/Users/ftucciar/
+TARGET_DIR=srcNEMO
+TARGET_PATH=/Users/ftucciar/LocationUncertainty/
 
 # name of the package created
 TARGET_PKG=LU_routines
