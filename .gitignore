@@ -3,6 +3,10 @@
 ###########
 __pycache__/
 
+# Swap files #
+##############
+*.swp
+
 # Compiled source #
 ###################
 *.com
