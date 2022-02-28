@@ -136,128 +136,86 @@ CONTAINS
       ALLOCATE(zw0(jpi,jpj,jpk))
       ALLOCATE(zw1(jpi,jpj,jpk), zw2(jpi,jpj,jpk))
 
-      !
 
-      DO jn = 1, jpts            !==  loop over the tracers  ==!
 
-         ! Tracer averages
-         zcnf = 0._wp     ! For extra-diagonal components (at f-point)
-
-         ! Support vectors
-         zw0 = 0._wp
-         zw1 = 0._wp
-         zw2 = 0._wp
-         !
-         ! Interpolation of the Tracer component
-         DO jk = 1, jpkm1
-            DO jj = 1, jpjm1
-               DO ji = 1, jpim1 
-                  zcnf(ji,jj,jk) = 0.5_wp * ( ptn(ji  ,jj  ,jk  ,jn) + ptn(ji+1,jj  ,jk  ,jn) + &
-                                   &          ptn(ji  ,jj+1,jk  ,jn) + ptn(ji+1,jj+1,jk  ,jn) ) * fmask(ji,jj,jk)  
-               END DO
+      DO jk = 1, jpkm1              !==  Interpolation of variance tensor  ==!
+         DO jj = 2, jpjm1
+            DO ji = fs_2, fs_jpim1
+               int_var11(ji,jj,jk) = ( var_ten(ji  ,jj  ,jk,ia11) + var_ten(ji-1,jj  ,jk,ia11) ) * 0.5_wp
+               int_var12(ji,jj,jk) = ( var_ten(ji  ,jj  ,jk,ia12) + var_ten(ji  ,jj-1,jk,ia12) ) * 0.5_wp
+               int_var21(ji,jj,jk) = ( var_ten(ji  ,jj  ,jk,ia12) + var_ten(ji-1,jj  ,jk,ia12) ) * 0.5_wp
+               int_var22(ji,jj,jk) = ( var_ten(ji  ,jj  ,jk,ia22) + var_ten(ji  ,jj-1,jk,ia22) ) * 0.5_wp
             END DO
          END DO
-         ! Both averages checkd
-         !
-         ! Lateral boundary condition transfer across nodes
-         CALL lbc_lnk_multi( 'tlu_trahhdiff', zcnf, 'F', 1. )
-         !                                ! ================
-         DO jk = 1, jpkm1                 ! Horizontal slab
-            !                             ! ================
-            !
-            ! First component: Double x derivative using a centered scheme inside comp. domain 
-            ! No halo is computed here!!!
-            DO jj = 1,jpj
-               DO ji = 2,jpim1 
-                  ! Before (     i   - (i-1)   )
-                  zwb =  ( e2t(ji  ,jj) * e3t_n(ji  ,jj,jk) * var_ten(ji  ,jj,jk,ia11) * ptn(ji  ,jj,jk,jn)   &
-                       & - e2t(ji-1,jj) * e3t_n(ji-1,jj,jk) * var_ten(ji-1,jj,jk,ia11) * ptn(ji-1,jj,jk,jn) ) &
-                       & * r1_e1u(ji-1,jj) * umask(ji-1,jj,jk)
-                  ! After  (   (i+1) -   i     )
-                  zwa =  ( e2t(ji+1,jj) * e3t_n(ji+1,jj,jk) * var_ten(ji+1,jj,jk,ia11) * ptn(ji+1,jj,jk,jn)   &
-                       & - e2t(ji  ,jj) * e3t_n(ji  ,jj,jk) * var_ten(ji  ,jj,jk,ia11) * ptn(ji  ,jj,jk,jn) ) &
-                       & * r1_e1u(ji  ,jj) * umask(ji  ,jj,jk)
-                  ! Double derivative in x
-                  zw0(ji,jj,jk) = zw0(ji,jj,jk)  + 0.5_wp * r1_e1e2t(ji,jj) * tmask(ji,jj,jk) * (SC**2) &
-                                   & * ( zwa  - zwb ) / e3t_n(ji,jj,jk)
-               END DO
-            END DO
-            ! scheme check'd with quad3D(zcnt) before jk loop. 23/06/2021
-            !
-            !
-            ! Second component: Double y derivative
-            DO jj = 2,jpjm1
-               DO ji = 1,jpi
-                  ! Before (     j   - (j-1)   )
-                  zwb = ( e1t(ji,jj  ) * e3t_n(ji,jj  ,jk) * var_ten(ji,jj  ,jk,ia11) * ptn(ji,jj  ,jk,jn)   &
-                      & - e1t(ji,jj-1) * e3t_n(ji,jj-1,jk) * var_ten(ji,jj-1,jk,ia11) * ptn(ji,jj-1,jk,jn) ) &
-                      & * r1_e2v(ji,jj-1) * vmask(ji,jj-1,jk)
-                  ! After (   (j+1) -   j     )
-                  zwa = ( e1t(ji,jj+1) * e3t_n(ji,jj+1,jk) * var_ten(ji,jj+1,jk,ia11) * ptn(ji,jj+1,jk,jn)   &
-                      & - e1t(ji,jj  ) * e3t_n(ji,jj  ,jk) * var_ten(ji,jj  ,jk,ia11) * ptn(ji,jj  ,jk,jn) ) &
-                      & * r1_e2v(ji,jj  ) * vmask(ji,jj  ,jk)
-                  ! Double derivative in x
-                  zw0(ji,jj,jk) = zw0(ji,jj,jk) + 0.5_wp * r1_e1e2t(ji,jj) * tmask(ji,jj,jk) * (SC**2)  &
-                                   & * ( zwa  - zwb ) / e3t_n(ji,jj,jk)
-               END DO
-            END DO
-            ! scheme check'd with quad3D(zcnt) before jk loop. 23/06/2021
-            !
-            !
-            ! Third component: mixed derivatives 
-            DO jj = 2, jpj
-               DO ji = 1, jpi
-                  !  Derivation in j (inner divergence) leads to u-points
-                  zw1(ji,jj,jk) = (  e1f(ji,jj  ) * e3f_n(ji,jj  ,jk) * var_ten(ji,jj  ,jk,ia12) * zcnf(ji,jj  ,jk)   &
-                                & -  e1f(ji,jj-1) * e3f_n(ji,jj-1,jk) * var_ten(ji,jj-1,jk,ia12) * zcnf(ji,jj-1,jk) ) &
-                                & * umask(ji,jj,jk) * r1_e1u(ji,jj)
-               END DO  
-            END DO
-            DO jj = 1, jpj
-               DO ji = 2, jpi
-                  !  Derivation in i (inner divergence) leads to v-points
-                  zw2(ji,jj,jk) = (  e2f(ji  ,jj) * e3f_n(ji  ,jj,jk) * var_ten(ji  ,jj,jk,ia12) * zcnf(ji  ,jj,jk)   &
-                                & -  e2f(ji-1,jj) * e3f_n(ji-1,jj,jk) * var_ten(ji-1,jj,jk,ia12) * zcnf(ji-1,jj,jk) ) &
-                                & * vmask(ji,jj,jk) * r1_e2v(ji,jj)
-               END DO  
-            END DO
-            DO jj = 2, jpj
-               DO ji = 2, jpi
-                  !  Derivation in i (outer divergence) leads to T-points
-                  zw0(ji,jj,jk) = zw0(ji,jj,jk) + 0.5_wp * r1_e1e2t(ji,jj) * tmask(ji,jj,jk) * (SC**2)  &
-                                & * ( zw1(ji  ,jj  ,jk  ) - zw1(ji-1,jj  ,jk  ) ) / e3t_n(ji,jj,jk)
-               END DO  
-            END DO
-            DO jj = 2, jpj
-               DO ji = 2, jpi
-                  !  Derivation in j (outer divergence) leads to T-points
-                  zw0(ji,jj,jk) = zw0(ji,jj,jk) + 0.5_wp * r1_e1e2t(ji,jj) * tmask(ji,jj,jk) * (SC**2)  &
-                                & * ( zw2(ji  ,jj  ,jk  ) - zw2(ji  ,jj-1,jk  ) ) / e3t_n(ji,jj,jk)
-               END DO  
-            END DO
-            ! scheme check'd with biLin3D(zcnf) before jk loop. 23/06/2021
-
-            !                             ! ================
-         END DO                           !   End of slab
-         !                                ! ================
-
-         CALL lbc_lnk_multi( 'tlu_trahhdiff', zw0 , 'T', 1.)
-
-         !                                ! ================
-         DO jk = 1, jpkm1                 ! Horizontal slab
-            !                             ! ================
-            DO jj = 1, jpj
-               DO ji = 1, jpi
-                  ! Averaging and update of the velocity component
-                  ! This is a diffusion component added to the RIGHT-HAND SIDE, so positive
-                  pta(ji,jj,jk,jn) = pta(ji,jj,jk,jn) + zw0 (ji,jj,jk)
-               END DO
-            END DO
-            !                             ! ================
-         END DO                           !   End of slab
-         !                                ! ================
-      END DO
+      END DO  
       !
+      CALL lbn_multi()
+      !
+      !                             ! =========== !
+      DO jn = 1, kjpt               ! tracer loop !
+         !                          ! =========== !    
+         !                               
+         DO jk = 1, jpkm1              !==  First derivative (gradient)  ==!
+            DO jj = 1, jpjm1
+               DO ji = 1, fs_jpim1
+                  ztuu(ji,jj,jk) = int_var11(ji,jj,jk) * ( ptb(ji+1,jj  ,jk,jn) - ptb(ji,jj,jk,jn) )
+                  ztuv(ji,jj,jk) = int_var12(ji,jj,jk) * ( ptb(ji  ,jj+1,jk,jn) - ptb(ji,jj,jk,jn) )
+                  ztvv(ji,jj,jk) = int_var21(ji,jj,jk) * ( ptb(ji  ,jj+1,jk,jn) - ptb(ji,jj,jk,jn) )
+                  ztvu(ji,jj,jk) = int_var22(ji,jj,jk) * ( ptb(ji+1,jj  ,jk,jn) - ptb(ji,jj,jk,jn) )
+               END DO
+            END DO
+         END DO  
+         !
+         zw0 = 0._wp
+         !
+         !
+         DO jk = 1, jpkm1              !==  Second derivative (divergence) added to the general tracer trends  ==!
+            DO jj = 2, jpjm1
+               DO ji = fs_2, fs_jpim1
+                  !
+                  ! Diagonal terms of the diffusion
+                  !
+                  pta(ji,jj,jk,jn) = pta(ji,jj,jk,jn) + (  ztuu(ji,jj,jk) - ztuu(ji-1,jj,jk)     &
+                     &                                   + ztvv(ji,jj,jk) - ztvv(ji,jj-1,jk) )   &
+                     &                                / ( e1e2t(ji,jj) * e3t_n(ji,jj,jk) )
+                  !
+                  ! Extra-diagonal terms (need interpolation later)
+                  !
+                  zw0(ji,jj,jk,jn) = zw0(ji,jj,jk,jn) + (  ztuv(ji,jj,jk) - ztuv(ji-1,jj,jk)     &
+                     &                                   + ztvu(ji,jj,jk) - ztvu(ji,jj-1,jk) )   &
+                     &                                / ( e1e2t(ji,jj) * e3t_n(ji,jj,jk) )
+
+               END DO
+            END DO
+         END DO  
+         !                          ! ==================
+      END DO                        ! end of tracer loop
+      !                             ! ==================
+
+      !
+      CALL lbn_multi(zw0)
+      !
+
+      !                             ! =========== !
+      DO jn = 1, kjpt               ! tracer loop !
+         !                          ! =========== !    
+         !
+         DO jk = 1, jpkm1              !==  Second derivative (divergence) added to the general tracer trends  ==!
+            DO jj = 2, jpjm1
+               DO ji = fs_2, fs_jpim1
+                  !
+                  ! Extra-diagonal terms 
+                  !
+                  pta(ji,jj,jk,jn) = pta(ji,jj,jk,jn) + (  zw0(ji  ,jj  ,jk) + zw0(ji-1,jj  ,jk)     &
+                     &                                   + zw0(ji  ,jj-1,jk) + zw0(ji-1,jj-1,jk) ) * 0.25_wp 
+                  !
+               END DO
+            END DO
+         END DO  
+         !                          ! ==================
+      END DO                        ! end of tracer loop
+      !                             ! ==================
+
       DEALLOCATE(zw0, zw1, zw2)
 
    END SUBROUTINE tlu_trahhdiff
@@ -336,164 +294,27 @@ CONTAINS
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~ '
       ENDIF
 
-
       ALLOCATE(zw0(jpi,jpj,jpk))
 
 
       DO jn = 1, jpts            !==  loop over the tracers  ==!
-
-         ! Velocity averages
-         zacni = 0._wp     ! average in i
-         zacnj = 0._wp     ! average in j
-         zacnik = 0._wp    ! average in ik simultaneously
-         zacnjk = 0._wp    ! average in jk simultaneously
-
-         ! Support vectors
-         zw0 = 0._wp
-
-         ! First of all I need to take the tracer to uw and vw grids:
-         ! performing T -> v 
-         ! performing T -> u
-         !
-         DO jk = 1, jpkm1
-            DO jj = 1, jpjm1
-               DO ji = 1, jpim1
-                  zacni(ji,jj,jk) = 0.5_wp * ( ptn(ji  ,jj  ,jk  ,jn) + ptn(ji+1,jj  ,jk  ,jn) ) * umask(ji,jj,jk)
-                  zacnj(ji,jj,jk) = 0.5_wp * ( ptn(ji  ,jj  ,jk  ,jn) + ptn(ji  ,jj+1,jk  ,jn) ) * vmask(ji,jj,jk)
-               END DO
-            END DO
-         END DO
-
-         DO jk = 2, jpk
-            DO jj = 1, jpjm1
-               DO ji = 2, jpim1
-                  zacnik(ji,jj,jk) = 0.5_wp * ( zacni(ji,jj,jk) + zacni(ji,jj,jk-1) ) * wumask(ji,jj,jk)
-                  zacnjk(ji,jj,jk) = 0.5_wp * ( zacnj(ji,jj,jk) + zacnj(ji,jj,jk-1) ) * wvmask(ji,jj,jk)
-               END DO
-            END DO
-         END DO
-
-         ! Both averages checkd
-         !
-         ! Lateral boundary condition transfer across nodes
-         !
-         CALL lbc_lnk_multi( 'tlu_hzdiff', zacnik, 'U', -1., zacnjk, 'V', -1. )
-
-
-         !                                ! ================
-         DO jk = 2, jpkm1                 ! Horizontal slab
-            !                             ! ================
-            DO jj = 2, jpj
-               DO ji= 2, jpi
-                  !               Top-right        (   (i  ,k-1)   )
-                  zwtr = var_ten(ji  ,jj  ,jk-1,ia13) * zacnik(ji  ,jj  ,jk-1)
-                  !              Below-right       (   (i  ,k  )   )
-                  zwbr = var_ten(ji  ,jj  ,jk  ,ia13) * zacnik(ji  ,jj  ,jk  ) 
-                  ! Right derivative in z;      ( Top-Right - Below-Right )
-                  zwr = e2u(ji  ,jj  ) * (zwtr - zwbr) * umask(ji  ,jj,jk)
-                  !               Top-left         (   (i-1,k-1)   )
-                  zwtl = var_ten(ji-1,jj  ,jk-1,ia13) * zacnik(ji-1,jj  ,jk-1) 
-                  !              Below-left        (   (i-1,k  )   )
-                  zwbl = var_ten(ji-1,jj  ,jk  ,ia13) * zacnik(ji-1,jj  ,jk  )
-                  ! Left derivative in z;       ( Top-Left - Below-Left )
-                  zwl = e2u(ji-1,jj  ) * (zwtl - zwbl) * umask(ji-1,jj,jk)
-                  ! Right-Left derivative (in x)
-                  zw0(ji,jj,jk) = zw0(ji,jj,jk) + 0.5_wp * r1_e1e2t(ji,jj) * &
-                                   & ( zwr - zwl ) * tmask(ji,jj,jk) * (SC**2)  / e3t_n(ji,jj,jk)
-               END DO
-            END DO
-            !                             ! ================
-         END DO                           !   End of slab
-         !                                ! ================
-
-         !                                ! ================
-         DO jk = 2, jpkm1                 ! Horizontal slab
-            !                             ! ================
-            DO jj = 2, jpj
-               DO ji= 2, jpi
-                  !               Top-right        (   (j  ,k-1)   )
-                  zwtr = var_ten(ji  ,jj  ,jk-1,ia23) * zacnjk(ji  ,jj  ,jk-1)
-                  !              Below-right       (   (j  ,k  )   )
-                  zwbr = var_ten(ji  ,jj  ,jk  ,ia23) * zacnjk(ji  ,jj  ,jk  ) 
-                  ! Right derivative in z;      ( Top-Right - Below-Right )
-                  zwr = e1v(ji  ,jj  ) * (zwtr - zwbr) * vmask(ji,jj  ,jk)
-                  !               Top-left         (   (j-1,k-1)   )
-                  zwtl = var_ten(ji  ,jj-1,jk-1,ia23) * zacnjk(ji  ,jj-1,jk-1) 
-                  !              Below-left        (   (j-1,k  )   )
-                  zwbl = var_ten(ji  ,jj-1,jk  ,ia23) * zacnjk(ji  ,jj-1,jk  )
-                  ! Left derivative in z;       ( Top-Left - Below-Left )
-                  zwl = e1v(ji  ,jj-1) * (zwtl - zwbl) * vmask(ji,jj-1,jk)
-                  ! Right-Left derivative (in y)
-                  zw0(ji,jj,jk) = zw0(ji,jj,jk) + 0.5_wp * r1_e1e2t(ji,jj) * &
-                                   & ( zwr - zwl ) * tmask(ji,jj,jk) * (SC**2)  / e3t_n(ji,jj,jk)
-               END DO
-            END DO
-            !                             ! ================
-         END DO                           !   End of slab
-         !                                ! ================
-
-
-         !                                ! ================
-         DO jk = 2, jpkm1                 ! Horizontal slab
-            !                             ! ================
-            DO jj = 2, jpj
-               DO ji= 2, jpi
-                  !               Top-right        (   (j  ,k-1)   )
-                  zwtr = e2u(ji  ,jj  ) * e3uw_n(ji  ,jj  ,jk-1) * var_ten(ji  ,jj  ,jk-1,ia13) * zacnik(ji  ,jj  ,jk-1)
-                  !               Top-left         (   (j-1,k-1)   )
-                  zwtl = e2u(ji-1,jj  ) * e3uw_n(ji-1,jj  ,jk-1) * var_ten(ji-1,jj  ,jk-1,ia13) * zacnik(ji-1,jj  ,jk-1) 
-                  ! Right derivative in z;      ( Top-Right - Below-Right )
-                  zwt = r1_e1e2t(ji  ,jj  ) * ( zwtr - zwtl ) * wmask(ji,jj,jk-1) / e3w_n(ji  ,jj  ,jk-1) 
-                  !              Below-right       (   (j  ,k  )   )
-                  zwbr = e2u(ji  ,jj  ) * e3uw_n(ji  ,jj  ,jk  ) * var_ten(ji  ,jj  ,jk  ,ia13) * zacnik(ji  ,jj  ,jk  ) 
-                  !              Below-left        (   (j-1,k  )   )
-                  zwbl = e2u(ji-1,jj  ) * e3uw_n(ji-1,jj  ,jk  ) * var_ten(ji-1,jj  ,jk  ,ia13) * zacnik(ji-1,jj  ,jk  )
-                  ! Left derivative in z;       ( Top-Left - Below-Left )
-                  zwb = r1_e1e2t(ji  ,jj  ) * ( zwbr - zwbl ) * wmask(ji,jj,jk  ) / e3w_n(ji  ,jj  ,jk  )
-                  ! Right-Left derivative (in y)
-                  zw0(ji,jj,jk) = zw0(ji,jj,jk) + 0.5_wp * (zwt - zwb) * (SC**2) * tmask(ji,jj,jk) / e3t_n(ji,jj,jk) 
-               END DO
-            END DO
-            !                             ! ================
-         END DO                           !   End of slab
-         !                                ! ================
-
-
-         !                                ! ================
-         DO jk = 2, jpkm1                 ! Horizontal slab
-            !                             ! ================
-            DO jj = 2, jpj
-               DO ji= 2, jpi
-                  !               Top-right        (   (j  ,k-1)   )
-                  zwtr = e1u(ji  ,jj  ) * e3uw_n(ji  ,jj  ,jk-1) * var_ten(ji  ,jj  ,jk-1,ia23)*zacnjk(ji  ,jj  ,jk-1)
-                  !               Top-left         (   (j-1,k-1)   )
-                  zwtl = e1u(ji  ,jj-1) * e3uw_n(ji  ,jj-1,jk-1) * var_ten(ji  ,jj-1,jk-1,ia23)*zacnjk(ji  ,jj-1,jk-1) 
-                  ! Top derivative in y;      ( Top-Right - Below-Right )
-                  zwt = r1_e1e2t(ji  ,jj  ) * ( zwtr - zwtl ) * wmask(ji,jj,jk-1) / e3w_n(ji  ,jj  ,jk-1) 
-                  !              Below-right       (   (j  ,k  )   )
-                  zwbr = e1u(ji  ,jj  ) * e3uw_n(ji  ,jj  ,jk  ) * var_ten(ji  ,jj  ,jk  ,ia23)*zacnjk(ji  ,jj  ,jk  ) 
-                  !              Below-left        (   (j-1,k  )   )
-                  zwbl = e1u(ji  ,jj-1) * e3uw_n(ji  ,jj-1,jk  ) * var_ten(ji  ,jj-1,jk  ,ia23)*zacnjk(ji  ,jj-1,jk  )
-                  ! Bottom derivative in y;       ( Top-Left - Below-Left )
-                  zwb = r1_e1e2t(ji  ,jj  ) * ( zwbr - zwbl ) * wmask(ji,jj,jk  ) / e3w_n(ji  ,jj  ,jk  )
-                  ! Derivative in z
-                  zw0(ji,jj,jk) = zw0(ji,jj,jk) + 0.5_wp * (zwt - zwb) * (SC**2) * tmask(ji,jj,jk) / e3t_n(ji,jj,jk) 
-               END DO
-            END DO
-            !
-            !
-            DO jj = 2, jpj
-               DO ji = 2, jpim1
-                  ! Averaging and update of the velocity component
-                  ! This is a diffusion component added to the RIGHT-HAND SIDE, so positive
-                  pta (ji  ,jj  ,jk  ,jn) = pta(ji  ,jj  ,jk  ,jn) + zw0 (ji+1,jj  ,jk  )
-               END DO  
-            END DO
-            !                             ! ================
-         END DO                           !   End of slab
-         !                                ! ================
+         
+         
+         
+         
+         
+          
+         
+         
+         
+         
+         
+         
+         
+         
+                                                           
       END DO
-      !
+
    END SUBROUTINE tlu_trahzdiff
    ! [tlu_trahzdiff]
 
@@ -559,67 +380,54 @@ CONTAINS
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~ '
       ENDIF
 
-
       ALLOCATE(zw0(jpi,jpj,jpk))
 
-      DO jn = 1, jpts            !==  loop over the tracers  ==!
-         ! Support vectors
-         zw0 = 0._wp
-         !
-         DO jj = 1,jpj
-            DO ji = 1,jpi
-               !
-               ! ==========================
-               ! Surface boundary condition 
-               ! ==========================
-               !
-               !                               Top        (   (k+1) -   k      )
-               zwt =     var_ten(ji,jj,1  ,ia33) * ptn(ji,jj,1  ,jn) * (-1._wp) * &
-                   &     wmask(ji,jj,1) / e3w_n(ji,jj,1  )
-               !                              Below       (     k   - (k-1)    )
-               zwb =   ( var_ten(ji,jj,1,ia33) * ptn(ji,jj,1,jn) -   & 
-                   &     var_ten(ji,jj,2,ia33) * ptn(ji,jj,2,jn) ) * &
-                   &     wmask(ji,jj,2) / e3w_n(ji,jj,2)
-               ! Double derivative in z;    Top - Below   ( (k+1) - 2k + (k-1) )
-               zw0(ji,jj,1) = + 0.5_wp * ( zwt  - zwb ) * (SC**2) * tmask(ji,jj,1) / e3t_n(ji,jj,1)
-               !
-               !                          ! ================
-               DO jk = 2, jpkm1           ! Horizontal slab
-                  !                       ! ================
-                  !
-                  !                               Top        (   (k+1) -   k      )
-                  zwt =   ( var_ten(ji,jj,jk-1,ia33) * ptn(ji,jj,jk-1,jn) -   & 
-                      &     var_ten(ji,jj,jk  ,ia33) * ptn(ji,jj,jk  ,jn) ) * &
-                      &     wmask(ji,jj,jk) / e3w_n(ji,jj,jk  )
-                  !                              Below       (     k   - (k-1)    )
-                  zwb =   ( var_ten(ji,jj,jk  ,ia33) * ptn(ji,jj,jk  ,jn) -   & 
-                      &     var_ten(ji,jj,jk+1,ia33) * ptn(ji,jj,jk+1,jn) ) * &
-                      &     wmask(ji,jj,jk+1) / e3w_n(ji,jj,jk+1)
-                  ! Double derivative in z;    Top - Below   ( (k+1) - 2k + (k-1) )
-                  zw0(ji,jj,jk) = + 0.5_wp * ( zwt  - zwb ) * (SC**2) * tmask(ji,jj,jk) / e3t_n(ji,jj,jk)
-                  !
-                  !                       ! ================
-               END DO                     !   End of slab
-               !                          ! ================
+      DO jj = 1, jpj             !==  Interpolation of variance tensor  ==!
+         DO ji = fs_1, fs_jpi
+            inti_var(ji,jj,1) = ( var_ten(ji,jj,1  ,ia33) ) * 0.5_wp
+         END DO
+      END DO
+
+      DO jk = 2, jpkm1  
+         DO jj = 1, jpj
+            DO ji = fs_1, fs_jpi
+               int_var(ji,jj,jk) = ( var_ten(ji,jj,jk  ,ia33) + var_ten(ji,jj,jk-1,ia33) ) * 0.5_wp
             END DO
          END DO
-         !                                ! ================
-         DO jk = 1, jpkm1                 ! Horizontal slab   replace 1 with 2 in case of no sbc
-            !                             ! ================
-            DO jj = 1, jpj
-               DO ji = 1, jpim1
-                  ! Averaging and update of the velocity component
-                  ! This is a diffusion component added to the RIGHT-HAND SIDE, so positive
-                  pta (ji  ,jj  ,jk  ,jn) = pta(ji  ,jj  ,jk  ,jn) + zw0 (ji  ,jj  ,jk)
-               END DO  
+      END DO  
+
+      DO jn = 1, jpts            !==  loop over the tracers  ==!
+         
+         DO jj = 1, jpj
+            DO ji = 1, fs_jpi
+               ztww(ji,jj,1) = int_var(ji,jj,1) * ( ptb(ji,jj,1,jn) ) * (-1._wp)
             END DO
-            !                             ! ================
-         END DO                           !   End of slab
-         !                                ! ================
+         END DO
+         DO jk = 2, jpk              !==  First derivative (gradient)  ==!
+            DO jj = 1, jpj
+               DO ji = 1, fs_jpi
+                  ztww(ji,jj,jk) = int_var(ji,jj,jk) * ( ptb(ji,jj,jk-1,jn) - ptb(ji,jj,jk,jn) )    &
+                      &                                / ( e3w_n(ji,jj,jk) )
+               END DO
+            END DO
+         END DO           
+         
+         DO jk = 1, jpkm1              !==  Second derivative (divergence) added to the general tracer trends  ==!
+            DO jj = 1, jpj
+               DO ji = fs_1, fs_jpi
+                  !
+                  ! Vertical term of the diffusion
+                  !
+                  pta(ji,jj,jk,jn) = pta(ji,jj,jk,jn) + (  ztww(ji,jj,jk-1) - ztww(ji,jj,jk)     &
+                     &                                / ( e3t_n(ji,jj,jk) )
+                  !
+               END DO
+            END DO
+         END DO         
+                                                           
       END DO
 
       DEALLOCATE(zw0)
-
 
    END SUBROUTINE tlu_trazzdiff
    ! [tlu_trazzdiff]
