@@ -177,7 +177,7 @@ CONTAINS
       !
       ! Lateral boundary condition transfer across nodes
       !
-      CALL lbc_lnk_multi( 'tlu_hhdiff', uisd_n , 'U', 1., visd_n , 'V', 1., wisd_n , 'T', 1.  )
+      CALL lbc_lnk_multi( 'tlu_isd', uisd_n , 'U', 1., visd_n , 'V', 1., wisd_n , 'T', 1.  )
       !
       ! Print Ito-Stokes Drift
       !
