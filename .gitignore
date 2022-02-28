@@ -1,3 +1,8 @@
+
+# Folders #
+###########
+./CoarseGraining/__pycache__
+
 # Compiled source #
 ###################
 *.com
@@ -8,9 +13,10 @@
 *.so
 *.out
 
-# NetCDF #
-##########
+# data and NetCDF #
+###################
 *.nc
+*.dat
 
 # Packages #
 ############

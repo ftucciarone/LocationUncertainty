@@ -1,0 +1,25 @@
+!!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+!!                       Configuration namelist 
+!!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+!
+!-----------------------------------------------------------------------
+&inout_param           !   parameters of coarse graining procedure 
+!-----------------------------------------------------------------------
+    iodir = ""
+   trcnam = "/Volumes/LaCie/Nemo/Data_Prannav/R27/100-102y/data/GYRE_5d_00010101_00021230_grid_T.nc"
+   uncnam = "/Volumes/LaCie/Nemo/Data_Prannav/R27/100-102y/data/GYRE_5d_00010101_00021230_grid_U.nc"
+   vncnam = "/Volumes/LaCie/Nemo/Data_Prannav/R27/100-102y/data/GYRE_5d_00010101_00021230_grid_V.nc"
+   wncnam = "/Volumes/LaCie/Nemo/Data_Prannav/R27/100-102y/data/GYRE_5d_00010101_00021230_grid_W.nc"
+   tggrid = "domain_cfg_out.nc"
+   outnam = "/Volumes/LaCie/Nemo/Data_Tuccia/R27/100-102y/data/ocref_r3.nc"
+/
+!-----------------------------------------------------------------------
+&array_param           !   parameters of coarse graining procedure 
+!-----------------------------------------------------------------------
+     nxto = 810 
+     nyto = 540 
+     nlo  = 31   
+     nto  = 144 
+     nso  = 9 
+      co  = 2 
+/
