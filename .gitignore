@@ -1,7 +1,7 @@
 
 # Folders #
 ###########
-./CoarseGraining/__pycache__
+__pycache__/
 
 # Compiled source #
 ###################
