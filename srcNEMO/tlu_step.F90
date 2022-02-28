@@ -264,10 +264,10 @@ CONTAINS
       END IF
       ! [Bias Tracer advection]
 
-      ! [Tracer Stochastic diffusion]
-      CALL tlu_trahhdiff( kt, tsn, tsa )
-      CALL tlu_trahzdiff( kt, tsn, tsa )
-      CALL tlu_trazzdiff( kt, tsn, tsa )
+      ! [Tracer Stochastic diffusion] ! b-fields because of euler scheme
+      CALL tlu_trahhdiff( kt, tsb, tsa )
+      CALL tlu_trahzdiff( kt, tsb, tsa )
+      CALL tlu_trazzdiff( kt, tsb, tsa )
       ! [Tracer Stochastic diffusion]
       !
       IF( ln_timing ) CALL timing_stop('tlu_tradyn')   ! [NEMO] check

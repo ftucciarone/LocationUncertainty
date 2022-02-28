@@ -60,8 +60,10 @@ MODULE tlutradiff
    PUBLIC tlu_trazzdiff      ! Called by 
    ! [public_sub]
    !
-   ! #  include "domzgr_substitute.h90"
-   !!--------------------------------------------------------------------------------------------------------------------------------
+
+   !! * Substitutions
+#  include "vectopt_loop_substitute.h90"
+   !
 CONTAINS
 
 
@@ -110,7 +112,7 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj,jpk,jpts), INTENT(in   ) ::   ptb                   ! before field (so its euler)
       REAL(wp), DIMENSION(jpi,jpj,jpk,jpts), INTENT(inout) ::   pta                   ! field trend
       !
-      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   zw0                   ! accumulation array
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:,:)            ::   zw0                   ! accumulation array
       !
       REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   int_var11             ! interpolation array
       REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   int_var12             ! interpolation array
@@ -150,13 +152,13 @@ CONTAINS
               & ztvu(jpi,jpj,jpk), &
               & ztvv(jpi,jpj,jpk)  )
 
-      ALLOCATE( zw0(jpi,jpj,jpk) )
+      ALLOCATE( zw0(jpi,jpj,jpk,2) )
 
 
 
       DO jk = 1, jpkm1              !==  Interpolation of variance tensor  ==!
          DO jj = 2, jpjm1
-            DO ji = fs_2, fs_jpim1
+            DO ji =  2, jpim1
                int_var11(ji,jj,jk) = ( var_ten(ji+1,jj  ,jk,ia11) + var_ten(ji  ,jj  ,jk,ia11) ) * 0.5_wp
                int_var12(ji,jj,jk) = ( var_ten(ji  ,jj  ,jk,ia12) + var_ten(ji  ,jj-1,jk,ia12) ) * 0.5_wp
                int_var21(ji,jj,jk) = ( var_ten(ji  ,jj  ,jk,ia12) + var_ten(ji-1,jj  ,jk,ia12) ) * 0.5_wp
@@ -173,12 +175,12 @@ CONTAINS
                         &                  int_var22 , 'V', 1.    )
       !
       !                             ! =========== !
-      DO jn = 1, kjpt               ! tracer loop !
+      DO jn = 1, jpts               ! tracer loop !
          !                          ! =========== !    
          !                               
          DO jk = 1, jpkm1              !==  First derivative (gradient)  ==!
             DO jj = 1, jpjm1
-               DO ji = 1, fs_jpim1
+               DO ji = 1, jpim1
                   ztuu(ji,jj,jk) = int_var11(ji,jj,jk) * ( ptb(ji+1,jj  ,jk,jn) - ptb(ji,jj,jk,jn) )
                   ztuv(ji,jj,jk) = int_var12(ji,jj,jk) * ( ptb(ji  ,jj+1,jk,jn) - ptb(ji,jj,jk,jn) )
                   ztvu(ji,jj,jk) = int_var21(ji,jj,jk) * ( ptb(ji+1,jj  ,jk,jn) - ptb(ji,jj,jk,jn) )
@@ -192,7 +194,7 @@ CONTAINS
          !
          DO jk = 1, jpkm1              !==  Second derivative (divergence) added to the general tracer trends  ==!
             DO jj = 2, jpjm1
-               DO ji = fs_2, fs_jpim1
+               DO ji = 2, jpim1
                   !
                   ! Diagonal terms of the diffusion
                   !
@@ -218,17 +220,17 @@ CONTAINS
       !
 
       !                             ! =========== !
-      DO jn = 1, kjpt               ! tracer loop !
+      DO jn = 1, jpts               ! tracer loop !
          !                          ! =========== !    
          !
          DO jk = 1, jpkm1              !==  Second derivative (divergence) added to the general tracer trends  ==!
             DO jj = 2, jpjm1
-               DO ji = fs_2, fs_jpim1
+               DO ji = 2, jpim1
                   !
                   ! Extra-diagonal terms 
                   !
-                  pta(ji,jj,jk,jn) = pta(ji,jj,jk,jn) + (  zw0(ji  ,jj  ,jk) + zw0(ji-1,jj  ,jk)     &
-                     &                                   + zw0(ji  ,jj-1,jk) + zw0(ji-1,jj-1,jk) ) * 0.25_wp 
+                  pta(ji,jj,jk,jn) = pta(ji,jj,jk,jn) + (  zw0(ji  ,jj  ,jk,jn) + zw0(ji-1,jj  ,jk,jn)     &
+                     &                                   + zw0(ji  ,jj-1,jk,jn) + zw0(ji-1,jj-1,jk,jn) ) * 0.25_wp 
                   !
                END DO
             END DO
@@ -237,7 +239,11 @@ CONTAINS
       END DO                        ! end of tracer loop
       !                             ! ==================
 
-      DEALLOCATE(zw0, zw1, zw2)
+      DEALLOCATE( int_var11, int_var12, int_var21, int_var22 )
+
+      DEALLOCATE( ztuu, ztuv, ztvu, ztvv )
+
+      DEALLOCATE( zw0 )
 
    END SUBROUTINE tlu_trahhdiff
    ! [tlu_trahhdiff]
@@ -315,7 +321,6 @@ CONTAINS
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~ '
       ENDIF
 
-      ALLOCATE(zw0(jpi,jpj,jpk))
 
 
       DO jn = 1, jpts            !==  loop over the tracers  ==!
@@ -404,14 +409,14 @@ CONTAINS
       ALLOCATE(ztww(jpi,jpj,jpk), int_var33(jpi,jpj,jpk) )
 
       DO jj = 1, jpj             !==  Interpolation of variance tensor  ==!
-         DO ji = fs_1, fs_jpi
+         DO ji = 1, jpi
             int_var33(ji,jj,1) = ( var_ten(ji,jj,1  ,ia33) ) * 0.5_wp
          END DO
       END DO
 
       DO jk = 2, jpkm1  
          DO jj = 1, jpj
-            DO ji = fs_1, fs_jpi
+            DO ji = 1, jpi
                int_var33(ji,jj,jk) = ( var_ten(ji,jj,jk  ,ia33) + var_ten(ji,jj,jk-1,ia33) ) * 0.5_wp
             END DO
          END DO
@@ -420,13 +425,13 @@ CONTAINS
       DO jn = 1, jpts            !==  loop over the tracers  ==!
          
          DO jj = 1, jpj
-            DO ji = 1, fs_jpi
+            DO ji = 1, jpi
                ztww(ji,jj,1) = int_var33(ji,jj,1) * ( ptb(ji,jj,1,jn) ) * (-1._wp)
             END DO
          END DO
          DO jk = 2, jpk              !==  First derivative (gradient)  ==!
             DO jj = 1, jpj
-               DO ji = 1, fs_jpi
+               DO ji = 1, jpi
                   ztww(ji,jj,jk) = int_var33(ji,jj,jk) * ( ptb(ji,jj,jk-1,jn) - ptb(ji,jj,jk,jn) )    &
                       &                                / ( e3w_n(ji,jj,jk) )
                END DO
@@ -435,11 +440,11 @@ CONTAINS
          
          DO jk = 1, jpkm1              !==  Second derivative (divergence) added to the general tracer trends  ==!
             DO jj = 1, jpj
-               DO ji = fs_1, fs_jpi
+               DO ji = 1, jpi
                   !
                   ! Vertical term of the diffusion
                   !
-                  pta(ji,jj,jk,jn) = pta(ji,jj,jk,jn) + (  ztww(ji,jj,jk-1) - ztww(ji,jj,jk)     &
+                  pta(ji,jj,jk,jn) = pta(ji,jj,jk,jn) + (  ztww(ji,jj,jk-1) - ztww(ji,jj,jk) )    &
                      &                                / ( e3t_n(ji,jj,jk) )
                   !
                END DO
@@ -448,7 +453,7 @@ CONTAINS
                                                            
       END DO
 
-      DEALLOCATE(zw0)
+      DEALLOCATE( ztww, int_var33 )
 
    END SUBROUTINE tlu_trazzdiff
    ! [tlu_trazzdiff]
