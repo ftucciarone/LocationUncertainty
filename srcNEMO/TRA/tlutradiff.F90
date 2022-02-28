@@ -105,15 +105,22 @@ CONTAINS
    !!---------------------------------------------------------------------------
    ! @snippet this tlu_trahhdiff
    ! [tlu_trahhdiff]
-   SUBROUTINE tlu_trahhdiff( kt, ptn, pta)
+   SUBROUTINE tlu_trahhdiff( kt, ptb, pta)
       INTEGER                              , INTENT(in   ) ::   kt                    ! ocean time-step index
-      REAL(wp), DIMENSION(jpi,jpj,jpk,jpts), INTENT(in   ) ::   ptn                   ! before field
+      REAL(wp), DIMENSION(jpi,jpj,jpk,jpts), INTENT(in   ) ::   ptb                   ! before field (so its euler)
       REAL(wp), DIMENSION(jpi,jpj,jpk,jpts), INTENT(inout) ::   pta                   ! field trend
       !
-      REAL(wp), DIMENSION(jpi,jpj,jpk)                     ::   zcnf                  ! averaged component on f grid
-      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   zw1, zw2              ! workspace
       REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   zw0                   ! accumulation array
-      REAL(wp)                                             ::   zwb, zwa              ! local scalars (FD before after)
+      !
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   int_var11             ! interpolation array
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   int_var12             ! interpolation array
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   int_var21             ! interpolation array
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   int_var22             ! interpolation array
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   ztuu                  ! workspace array
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   ztuv                  ! workspace array
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   ztvu                  ! workspace array
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   ztvv                  ! workspace array
+
       !
       INTEGER                                              ::   ji, jj, jk            ! dummy loop indices
       INTEGER                                              ::   jn                    ! tracer index
@@ -133,8 +140,17 @@ CONTAINS
       ENDIF
 
 
-      ALLOCATE(zw0(jpi,jpj,jpk))
-      ALLOCATE(zw1(jpi,jpj,jpk), zw2(jpi,jpj,jpk))
+      ALLOCATE( int_var11(jpi,jpj,jpk), &
+              & int_var12(jpi,jpj,jpk), &
+              & int_var21(jpi,jpj,jpk), &
+              & int_var22(jpi,jpj,jpk)  )
+
+      ALLOCATE( ztuu(jpi,jpj,jpk), &
+              & ztuv(jpi,jpj,jpk), &
+              & ztvu(jpi,jpj,jpk), &
+              & ztvv(jpi,jpj,jpk)  )
+
+      ALLOCATE( zw0(jpi,jpj,jpk) )
 
 
 
@@ -266,9 +282,9 @@ CONTAINS
    !!---------------------------------------------------------------------------
    ! @snippet this tlu_trahzdiff
    ! [tlu_trahzdiff]
-   SUBROUTINE tlu_trahzdiff( kt, ptn, pta)
+   SUBROUTINE tlu_trahzdiff( kt, ptb, pta)
       INTEGER                              , INTENT(in   ) ::   kt                    ! ocean time-step index
-      REAL(wp), DIMENSION(jpi,jpj,jpk,jpts), INTENT(in   ) ::   ptn                   ! before field
+      REAL(wp), DIMENSION(jpi,jpj,jpk,jpts), INTENT(in   ) ::   ptb                   ! before field (so its euler)
       REAL(wp), DIMENSION(jpi,jpj,jpk,jpts), INTENT(inout) ::   pta                   ! field trend
       !
       REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   zw0                   ! accumulation array
@@ -363,13 +379,13 @@ CONTAINS
    !!---------------------------------------------------------------------------
    ! @snippet this tlu_trazzdiff
    ! [tlu_trazzdiff]
-   SUBROUTINE tlu_trazzdiff( kt, ptn, pta)
+   SUBROUTINE tlu_trazzdiff( kt, ptb, pta)
       INTEGER                              , INTENT(in   ) ::   kt                    ! ocean time-step index
-      REAL(wp), DIMENSION(jpi,jpj,jpk,jpts), INTENT(in   ) ::   ptn                   ! before field
+      REAL(wp), DIMENSION(jpi,jpj,jpk,jpts), INTENT(in   ) ::   ptb                   ! before field (so its euler)
       REAL(wp), DIMENSION(jpi,jpj,jpk,jpts), INTENT(inout) ::   pta                   ! field trend
       !
-      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   zw0                   ! accumulation array
-      REAL(wp)                                             ::   zwt, zwb              ! local scalars (FD top bottom)
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   int_var33             ! interpolation array
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:)              ::   ztww                  ! workspace array
       !
       INTEGER                                              ::   ji, jj, jk            ! dummy loop indices
       INTEGER                                              ::   jn                    ! tracer index
@@ -377,7 +393,7 @@ CONTAINS
       INTEGER, PARAMETER                                   ::   ia33 = ndiffidx(3,3)  ! Mapping the indeces of a
       !!----------------------------------------------------------------------
       !
-      IF( ln_timing ) CALL timing_start('tlu_zzdiff')   ! [NEMO] check
+      IF( ln_timing ) CALL timing_start('tlu_trazzdiff')   ! [NEMO] check
       !
       IF( kt == nit000 )  THEN
          IF(lwp) WRITE(numout,*)
@@ -385,18 +401,18 @@ CONTAINS
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~ '
       ENDIF
 
-      ALLOCATE(zw0(jpi,jpj,jpk))
+      ALLOCATE(ztww(jpi,jpj,jpk), int_var33(jpi,jpj,jpk) )
 
       DO jj = 1, jpj             !==  Interpolation of variance tensor  ==!
          DO ji = fs_1, fs_jpi
-            inti_var(ji,jj,1) = ( var_ten(ji,jj,1  ,ia33) ) * 0.5_wp
+            int_var33(ji,jj,1) = ( var_ten(ji,jj,1  ,ia33) ) * 0.5_wp
          END DO
       END DO
 
       DO jk = 2, jpkm1  
          DO jj = 1, jpj
             DO ji = fs_1, fs_jpi
-               int_var(ji,jj,jk) = ( var_ten(ji,jj,jk  ,ia33) + var_ten(ji,jj,jk-1,ia33) ) * 0.5_wp
+               int_var33(ji,jj,jk) = ( var_ten(ji,jj,jk  ,ia33) + var_ten(ji,jj,jk-1,ia33) ) * 0.5_wp
             END DO
          END DO
       END DO  
@@ -405,13 +421,13 @@ CONTAINS
          
          DO jj = 1, jpj
             DO ji = 1, fs_jpi
-               ztww(ji,jj,1) = int_var(ji,jj,1) * ( ptb(ji,jj,1,jn) ) * (-1._wp)
+               ztww(ji,jj,1) = int_var33(ji,jj,1) * ( ptb(ji,jj,1,jn) ) * (-1._wp)
             END DO
          END DO
          DO jk = 2, jpk              !==  First derivative (gradient)  ==!
             DO jj = 1, jpj
                DO ji = 1, fs_jpi
-                  ztww(ji,jj,jk) = int_var(ji,jj,jk) * ( ptb(ji,jj,jk-1,jn) - ptb(ji,jj,jk,jn) )    &
+                  ztww(ji,jj,jk) = int_var33(ji,jj,jk) * ( ptb(ji,jj,jk-1,jn) - ptb(ji,jj,jk,jn) )    &
                       &                                / ( e3w_n(ji,jj,jk) )
                END DO
             END DO
