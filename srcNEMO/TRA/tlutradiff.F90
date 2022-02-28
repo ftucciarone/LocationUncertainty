@@ -124,7 +124,7 @@ CONTAINS
       !
       !!----------------------------------------------------------------------
       !
-      IF( ln_timing ) CALL timing_start('tlu_hhdiff')   ! [NEMO] check
+      IF( ln_timing ) CALL timing_start('tlu_trahhdiff')   ! [NEMO] check
       !
       IF( kt == nit000 )  THEN
          IF(lwp) WRITE(numout,*)
@@ -141,15 +141,20 @@ CONTAINS
       DO jk = 1, jpkm1              !==  Interpolation of variance tensor  ==!
          DO jj = 2, jpjm1
             DO ji = fs_2, fs_jpim1
-               int_var11(ji,jj,jk) = ( var_ten(ji  ,jj  ,jk,ia11) + var_ten(ji-1,jj  ,jk,ia11) ) * 0.5_wp
+               int_var11(ji,jj,jk) = ( var_ten(ji+1,jj  ,jk,ia11) + var_ten(ji  ,jj  ,jk,ia11) ) * 0.5_wp
                int_var12(ji,jj,jk) = ( var_ten(ji  ,jj  ,jk,ia12) + var_ten(ji  ,jj-1,jk,ia12) ) * 0.5_wp
                int_var21(ji,jj,jk) = ( var_ten(ji  ,jj  ,jk,ia12) + var_ten(ji-1,jj  ,jk,ia12) ) * 0.5_wp
-               int_var22(ji,jj,jk) = ( var_ten(ji  ,jj  ,jk,ia22) + var_ten(ji  ,jj-1,jk,ia22) ) * 0.5_wp
+               int_var22(ji,jj,jk) = ( var_ten(ji  ,jj+1,jk,ia22) + var_ten(ji  ,jj  ,jk,ia22) ) * 0.5_wp
             END DO
          END DO
       END DO  
       !
-      CALL lbn_multi()
+      ! Lateral boundary condition transfer across nodes
+      !
+      CALL lbc_lnk_multi( 'tlu_trahhdiff', int_var11 , 'U', 1.,   &
+                        &                  int_var12 , 'V', 1.,   &
+                        &                  int_var21 , 'U', 1.,   &
+                        &                  int_var22 , 'V', 1.    )
       !
       !                             ! =========== !
       DO jn = 1, kjpt               ! tracer loop !
@@ -160,8 +165,8 @@ CONTAINS
                DO ji = 1, fs_jpim1
                   ztuu(ji,jj,jk) = int_var11(ji,jj,jk) * ( ptb(ji+1,jj  ,jk,jn) - ptb(ji,jj,jk,jn) )
                   ztuv(ji,jj,jk) = int_var12(ji,jj,jk) * ( ptb(ji  ,jj+1,jk,jn) - ptb(ji,jj,jk,jn) )
-                  ztvv(ji,jj,jk) = int_var21(ji,jj,jk) * ( ptb(ji  ,jj+1,jk,jn) - ptb(ji,jj,jk,jn) )
-                  ztvu(ji,jj,jk) = int_var22(ji,jj,jk) * ( ptb(ji+1,jj  ,jk,jn) - ptb(ji,jj,jk,jn) )
+                  ztvu(ji,jj,jk) = int_var21(ji,jj,jk) * ( ptb(ji+1,jj  ,jk,jn) - ptb(ji,jj,jk,jn) )
+                  ztvv(ji,jj,jk) = int_var22(ji,jj,jk) * ( ptb(ji  ,jj+1,jk,jn) - ptb(ji,jj,jk,jn) )
                END DO
             END DO
          END DO  
@@ -193,7 +198,7 @@ CONTAINS
       !                             ! ==================
 
       !
-      CALL lbn_multi(zw0)
+      CALL lbc_lnk( 'tlu_trahhdiff', zw0, 'F', 1. )
       !
 
       !                             ! =========== !
