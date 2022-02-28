@@ -398,7 +398,7 @@ CONTAINS
       IF( kt == nit000 )  THEN
          IF(lwp) WRITE(numout,*)
          IF(lwp) WRITE(numout,*) 'tlu_trazzdiff : '
-         IF(lwp) WRITE(numout,*) '~~~~~~~~~~ '
+         IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~~ '
       ENDIF
 
       ALLOCATE(ztww(jpi,jpj,jpk), int_var33(jpi,jpj,jpk) )
