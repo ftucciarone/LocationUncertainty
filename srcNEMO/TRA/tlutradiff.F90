@@ -385,6 +385,9 @@ CONTAINS
    ! @snippet this tlu_trazzdiff
    ! [tlu_trazzdiff]
    SUBROUTINE tlu_trazzdiff( kt, ptb, pta)
+      !
+      USE tlutrasbc, ONLY : tlu_tradflux     
+      !
       INTEGER                              , INTENT(in   ) ::   kt                    ! ocean time-step index
       REAL(wp), DIMENSION(jpi,jpj,jpk,jpts), INTENT(in   ) ::   ptb                   ! before field (so its euler)
       REAL(wp), DIMENSION(jpi,jpj,jpk,jpts), INTENT(inout) ::   pta                   ! field trend
@@ -408,13 +411,13 @@ CONTAINS
 
       ALLOCATE(ztww(jpi,jpj,jpk), int_var33(jpi,jpj,jpk) )
 
-      DO jj = 1, jpj             !==  Interpolation of variance tensor  ==!
+      DO jj = 1, jpj               !==  Interpolation of variance tensor  ==!
          DO ji = 1, jpi
             int_var33(ji,jj,1) = ( var_ten(ji,jj,1  ,ia33) ) * 0.5_wp
          END DO
       END DO
 
-      DO jk = 2, jpkm1  
+      DO jk = 2, jpkm1             !==  Interpolation of variance tensor  ==!  
          DO jj = 1, jpj
             DO ji = 1, jpi
                int_var33(ji,jj,jk) = ( var_ten(ji,jj,jk  ,ia33) + var_ten(ji,jj,jk-1,ia33) ) * 0.5_wp
@@ -422,16 +425,12 @@ CONTAINS
          END DO
       END DO  
 
-      DO jn = 1, jpts            !==  loop over the tracers  ==!
+      DO jn = 1, jpts              !==  loop over the tracers  ==!
          !
-         ztww = 0._wp            ! Avoid bottom boudary fluxes
+         ztww = 0._wp   
+         CALL tlu_tradflux( kt, jn, ptb(:,:,1,jn), ztw(:,:,1)  )                  
          !
-         DO jj = 1, jpj
-            DO ji = 1, jpi
-               ztww(ji,jj,1) =  int_var33(ji,jj,1) * ( ptb(ji,jj,1,jn) ) * (-1._wp) / ( e3w_n(ji,jj,1) )
-            END DO
-         END DO
-         DO jk = 2, jpk              !==  First derivative (gradient)  ==!
+         DO jk = 2, jpk             !==  First derivative (gradient)  ==!
             DO jj = 1, jpj
                DO ji = 1, jpi
                   ztww(ji,jj,jk) = int_var33(ji,jj,jk) * ( ptb(ji,jj,jk-1,jn) - ptb(ji,jj,jk,jn) )   &
@@ -440,9 +439,9 @@ CONTAINS
             END DO
          END DO
          !
-         ztww(:,:,jpk) = 0._wp           
+         ztww(:,:,jpk) = 0._wp      ! Avoid bottom boudary fluxes
          
-         DO jk = 1, jpkm1              !==  Second derivative (divergence) added to the general tracer trends  ==!
+         DO jk = 1, jpkm1           !==  Second derivative (divergence) added to the general tracer trends  ==!
             DO jj = 1, jpj
                DO ji = 1, jpi
                   !
