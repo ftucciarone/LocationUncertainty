@@ -423,20 +423,24 @@ CONTAINS
       END DO  
 
       DO jn = 1, jpts            !==  loop over the tracers  ==!
-         
+         !
+         ztww = 0._wp            ! Avoid bottom boudary fluxes
+         !
          DO jj = 1, jpj
             DO ji = 1, jpi
-               ztww(ji,jj,1) = int_var33(ji,jj,1) * ( ptb(ji,jj,1,jn) ) * (-1._wp)
+               ztww(ji,jj,1) =  int_var33(ji,jj,1) * ( ptb(ji,jj,1,jn) ) * (-1._wp) / ( e3w_n(ji,jj,1) )
             END DO
          END DO
          DO jk = 2, jpk              !==  First derivative (gradient)  ==!
             DO jj = 1, jpj
                DO ji = 1, jpi
-                  ztww(ji,jj,jk) = int_var33(ji,jj,jk) * ( ptb(ji,jj,jk-1,jn) - ptb(ji,jj,jk,jn) )    &
+                  ztww(ji,jj,jk) = int_var33(ji,jj,jk) * ( ptb(ji,jj,jk-1,jn) - ptb(ji,jj,jk,jn) )   &
                       &                                / ( e3w_n(ji,jj,jk) )
                END DO
             END DO
-         END DO           
+         END DO
+         !
+         ztww(:,:,jpk) = 0._wp           
          
          DO jk = 1, jpkm1              !==  Second derivative (divergence) added to the general tracer trends  ==!
             DO jj = 1, jpj
@@ -444,13 +448,13 @@ CONTAINS
                   !
                   ! Vertical term of the diffusion
                   !
-                  pta(ji,jj,jk,jn) = pta(ji,jj,jk,jn) + (  ztww(ji,jj,jk-1) - ztww(ji,jj,jk) )    &
+                  pta(ji,jj,jk,jn) = pta(ji,jj,jk,jn) + (  ztww(ji,jj,jk) - ztww(ji,jj,jk+1) ) * 0.5_wp  &
                      &                                / ( e3t_n(ji,jj,jk) )
                   !
                END DO
             END DO
-         END DO         
-                                                           
+         END DO
+
       END DO
 
       DEALLOCATE( ztww, int_var33 )

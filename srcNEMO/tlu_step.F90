@@ -250,18 +250,18 @@ CONTAINS
 
       ! 
       ! [Tracer Advection]
-      CALL  tlu_tra_adv( kt, unoi, vnoi, wnoi)
-      CALL  tlu_tra_adv( kt, -1._wp * uisd_n, &
-                       &     -1._wp * visd_n, &
-                       &     -1._wp * wisd_n  )
+!      CALL  tlu_tra_adv( kt, unoi, vnoi, wnoi)
+!      CALL  tlu_tra_adv( kt, -1._wp * uisd_n, &
+!                       &     -1._wp * visd_n, &
+!                       &     -1._wp * wisd_n  )
       ! [Tracer Advection]
  
       ! [Bias Tracer advection]
-      IF (ln_tlu_bia) THEN
-         CALL  tlu_tra_adv( kt, -1._wp * biaSIGN * ubia, &
-                          &     -1._wp * biaSIGN * vbia, &
-                          &     -1._wp * biaSIGN * wbia  )
-      END IF
+!      IF (ln_tlu_bia) THEN
+!         CALL  tlu_tra_adv( kt, -1._wp * biaSIGN * ubia, &
+!                          &     -1._wp * biaSIGN * vbia, &
+!                          &     -1._wp * biaSIGN * wbia  )
+!      END IF
       ! [Bias Tracer advection]
 
       ! [Tracer Stochastic diffusion] ! b-fields because of euler scheme
