@@ -428,7 +428,7 @@ CONTAINS
       DO jn = 1, jpts              !==  loop over the tracers  ==!
          !
          ztww = 0._wp   
-         CALL tlu_tradflux( kt, jn, ptb(:,:,1,jn), ztw(:,:,1)  )                  
+         CALL tlu_tradflux( kt, jn, ptb(:,:,1,jn), ztww(:,:,1)  )                  
          !
          DO jk = 2, jpk             !==  First derivative (gradient)  ==!
             DO jj = 1, jpj

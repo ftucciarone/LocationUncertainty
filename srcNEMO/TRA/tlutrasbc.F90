@@ -111,7 +111,6 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj), INTENT(  out) ::   dflux                 ! flux at the top layer
       !
       INTEGER                                     ::   ji, jj, jk            ! dummy loop indices
-      INTEGER                                     ::   jn                    ! tracer index
       !
       INTEGER, PARAMETER                          ::   ia33 = ndiffidx(3,3)  ! Mapping the indeces of a
       !!----------------------------------------------------------------------
@@ -123,16 +122,15 @@ CONTAINS
          IF(lwp) WRITE(numout,*) 'tlu_tradflux : '
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~ '
       ENDIF
-
       !
       dflux = 0._wp
       !
       DO jj = 1, jpj
          DO ji = 1, jpi
-            dflux(ji,jj) = 0.5_wp * var_ten(:,:,1 ,ia33) * ( 0._wp - ptb(ji,jj) ) / ( e3w_n(ji,jj,1) )
+            dflux(ji,jj) = 0.5_wp * var_ten(ji,jj,1 ,ia33) * ( 0._wp - ptb(ji,jj) ) / ( e3w_n(ji,jj,1) )
          END DO
       END DO
-
+      !
    END SUBROUTINE tlu_tradflux
    ! [tlu_tradflux]
 
