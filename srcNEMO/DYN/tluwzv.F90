@@ -174,6 +174,9 @@ CONTAINS
          !                             ! ================
       END DO                           !   End of slab
       !                                ! ================
+      uisd_n = 0.5_wp * uisd_n 
+      visd_n = 0.5_wp * visd_n
+      wisd_n = 0.5_wp * wisd_n
       !
       ! Lateral boundary condition transfer across nodes
       !
@@ -181,11 +184,9 @@ CONTAINS
       !
       ! Print Ito-Stokes Drift
       !
-      IF( kt == nit000 )  THEN
-         CALL iom_put( 'U_isd', uisd_n )  
-         CALL iom_put( 'V_isd', visd_n )  
-         CALL iom_put( 'W_isd', wisd_n )  
-      END IF
+!      CALL iom_put( 'U_isd', uisd_n )  
+!      CALL iom_put( 'V_isd', visd_n )  
+!      CALL iom_put( 'W_isd', wisd_n )  
       !
    END SUBROUTINE tlu_isd
    ! [tlu_isd]
@@ -251,13 +252,6 @@ CONTAINS
                              & ( e1v(ji,jj+1) * e3v_n(ji,jj+1,jk) * visd_n(ji,jj+1,jk)        &
                              & - e1v(ji,jj  ) * e3v_n(ji,jj  ,jk) * visd_n(ji,jj  ,jk) ) *    &
                              &   tmask(ji,jj,jk) / e3t_n(ji,jj,jk)
-               !
-               ! Third component
-               !
-               ! dz( wdiva )
-               zwz(ji,jj,jk) =   zwz(ji,jj,jk) +                                  & 
-                             & ( wisd_n(ji,jj,jk  ) - wisd_n(ji,jj,jk+1) )  *     &
-                             &   wmask(ji,jj,jk) / e3w_n(ji,jj,jk)
             END DO
          END DO
          !                             ! ================
@@ -265,9 +259,9 @@ CONTAINS
       !                                ! ================
       !
       DO jk = jpkm1, 1, -1
-         tlu_wcorr(:,:,jk) = tlu_wcorr(:,:,jk+1) + 0.5_wp * e3t_n(:,:,jk) * zwz(:,:,jk) 
+         tlu_wcorr(:,:,jk) = tlu_wcorr(:,:,jk+1) + e3t_n(:,:,jk) * zwz(:,:,jk) 
          ! computation of w
-         wn(:,:,jk) = wn(:,:,jk) - tlu_wcorr(:,:,jk)
+         wn(:,:,jk) = wn(:,:,jk) + tlu_wcorr(:,:,jk) + wisd_n(:,:,jk)
       END DO
       !
    END SUBROUTINE tlu_wzvcmp

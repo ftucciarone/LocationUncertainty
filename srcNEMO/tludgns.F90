@@ -566,9 +566,10 @@ CONTAINS
       !!                
       !!                
       !!------------------------------------------------------------------------
-      INTEGER, INTENT(in   )                          :: kt
-      INTEGER                                         ::   ji, jj, jk  ! dummy loop indices
-
+      INTEGER, INTENT(in   )                      :: kt
+      INTEGER                                     ::   ji, jj, jk  ! dummy loop indices
+      !
+      INTEGER                                     ::  ierr
 
       IF ( kt == it0_counter) stat_counter = 0
   
@@ -614,18 +615,18 @@ CONTAINS
          !
          DO jj = 2, jpjm1
             DO ji = 2, jpim1   ! vector opt.
-                  usum (ji,jj) = usum (ji,jj,jk) + un(ji,jj,jk)
-                  usum2(ji,jj) = usum2(ji,jj,jk) + un(ji,jj,jk)**2
-                  vsum (ji,jj) = vsum (ji,jj,jk) + vn(ji,jj,jk)
-                  vsum2(ji,jj) = vsum2(ji,jj,jk) + vn(ji,jj,jk)**2
-                  wsum (ji,jj) = wsum (ji,jj,jk) + wn(ji,jj,jk)
-                  wsum2(ji,jj) = wsum2(ji,jj,jk) + wn(ji,jj,jk)**2
-                  tsum (ji,jj) = tsum (ji,jj,jk) + tsn(ji,jj,jk,1)
-                  tsum2(ji,jj) = tsum2(ji,jj,jk) + tsn(ji,jj,jk,1)**2
-                  ssum (ji,jj) = ssum (ji,jj,jk) + tsn(ji,jj,jk,2)
-                  ssum2(ji,jj) = ssum2(ji,jj,jk) + tsn(ji,jj,jk,2)**2
-                  vortsum (ji,jj) = vortsum (ji,jj,jk) + tvor(ji,jj,jk)
-                  vortsum2(ji,jj) = vortsum2(ji,jj,jk) + tvor(ji,jj,jk)**2
+                  usum (ji,jj,jk) = usum (ji,jj,jk) + un(ji,jj,jk)
+                  usum2(ji,jj,jk) = usum2(ji,jj,jk) + un(ji,jj,jk)**2
+                  vsum (ji,jj,jk) = vsum (ji,jj,jk) + vn(ji,jj,jk)
+                  vsum2(ji,jj,jk) = vsum2(ji,jj,jk) + vn(ji,jj,jk)**2
+                  wsum (ji,jj,jk) = wsum (ji,jj,jk) + wn(ji,jj,jk)
+                  wsum2(ji,jj,jk) = wsum2(ji,jj,jk) + wn(ji,jj,jk)**2
+                  tsum (ji,jj,jk) = tsum (ji,jj,jk) + tsn(ji,jj,jk,1)
+                  tsum2(ji,jj,jk) = tsum2(ji,jj,jk) + tsn(ji,jj,jk,1)**2
+                  ssum (ji,jj,jk) = ssum (ji,jj,jk) + tsn(ji,jj,jk,2)
+                  ssum2(ji,jj,jk) = ssum2(ji,jj,jk) + tsn(ji,jj,jk,2)**2
+                  vortsum (ji,jj,jk) = vortsum (ji,jj,jk) + tvor(ji,jj,jk)
+                  vortsum2(ji,jj,jk) = vortsum2(ji,jj,jk) + tvor(ji,jj,jk)**2
             END DO  
          END DO  
          !                                             ! ===============

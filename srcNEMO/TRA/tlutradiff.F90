@@ -411,19 +411,17 @@ CONTAINS
 
       ALLOCATE(ztww(jpi,jpj,jpk), int_var33(jpi,jpj,jpk) )
 
-      DO jj = 1, jpj               !==  Interpolation of variance tensor  ==!
-         DO ji = 1, jpi
-            int_var33(ji,jj,1) = ( var_ten(ji,jj,1  ,ia33) ) * 0.5_wp
-         END DO
-      END DO
+      int_var33 = 0.001_wp
 
-      DO jk = 2, jpkm1             !==  Interpolation of variance tensor  ==!  
-         DO jj = 1, jpj
-            DO ji = 1, jpi
-               int_var33(ji,jj,jk) = ( var_ten(ji,jj,jk  ,ia33) + var_ten(ji,jj,jk-1,ia33) ) * 0.5_wp
-            END DO
-         END DO
-      END DO  
+
+!      DO jk = 2, jpk               !==  Interpolation of variance tensor  ==!  
+!         DO jj = 1, jpj
+!            DO ji = 1, jpi
+!               int_var33(ji,jj,jk) = ( var_ten(ji,jj,jk  ,ia33)               & ! average()
+!                                   & + var_ten(ji,jj,jk-1,ia33) ) * 0.5_wp
+!            END DO
+!         END DO
+!      END DO  
 
       DO jn = 1, jpts              !==  loop over the tracers  ==!
          !
