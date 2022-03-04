@@ -125,14 +125,6 @@ CONTAINS
       !
       dflux = 0._wp
       !
-      DO jj = 1, jpj
-         DO ji = 1, jpi
-!            dflux(ji,jj) = 0.5_wp * var_ten(ji,jj,1 ,ia33) * ( 0._wp - ptb(ji,jj) ) / ( e3w_n(ji,jj,1) )
-
-!            dflux(ji,jj) = 0.5_wp * 0.001_wp * ( 0._wp - ptb(ji,jj) ) / ( e3w_n(ji,jj,1) )
-         END DO
-      END DO
-      !
    END SUBROUTINE tlu_tradflux
    ! [tlu_tradflux]
 
