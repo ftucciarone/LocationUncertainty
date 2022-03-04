@@ -1,0 +1,5 @@
+&nam_rebuild
+filebase='GYRE_5d_00010101_00101230_grid_U'
+ndomain=12
+/
+

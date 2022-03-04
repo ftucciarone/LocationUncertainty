@@ -266,7 +266,7 @@ CONTAINS
 
       ! [Tracer Stochastic diffusion] ! b-fields because of euler scheme
       CALL tlu_trahhdiff( kt, tsb, tsa )
-      CALL tlu_trahzdiff( kt, tsb, tsa )
+!     CALL tlu_trahzdiff( kt, tsb, tsa )
       CALL tlu_trazzdiff( kt, tsb, tsa )
       ! [Tracer Stochastic diffusion]
       !

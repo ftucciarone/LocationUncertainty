@@ -184,9 +184,9 @@ CONTAINS
       !
       ! Print Ito-Stokes Drift
       !
-!      CALL iom_put( 'U_isd', uisd_n )  
-!      CALL iom_put( 'V_isd', visd_n )  
-!      CALL iom_put( 'W_isd', wisd_n )  
+      CALL iom_put( 'U_isd', uisd_n )  
+      CALL iom_put( 'V_isd', visd_n )  
+      CALL iom_put( 'W_isd', wisd_n )  
       !
    END SUBROUTINE tlu_isd
    ! [tlu_isd]

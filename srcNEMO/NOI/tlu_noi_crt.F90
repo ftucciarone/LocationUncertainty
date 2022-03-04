@@ -683,7 +683,7 @@ CONTAINS
 
          DO jj = 2, jpjm1 
             DO ji = 2, jpim1
-               var_ten(ji, jj, jk-1, 3) = 0.5_wp * ( var_ten(ji, jj, jk-1, 3) + var_ten(ji, jj, jk, 3) )! ww on T grid      
+               var_ten(ji, jj, jk-1, 3) = 0.5_wp * ( var_ten(ji, jj, jk-1, 3) + var_ten(ji, jj, jk, 3) )! w on T grid      
             END DO
          END DO
          !                             ! ===============
@@ -697,7 +697,10 @@ CONTAINS
       ! 
       ! Lateral boundary condition transfer across nodes
       !
-      CALL lbc_lnk_multi( 'tlu_var_pod', var_ten(:,:,:,:) , 'T', -1.)
+      CALL lbc_lnk_multi( 'tlu_var_pod', var_ten(:,:,:,1:3) , 'T', -1.)
+      CALL lbc_lnk_multi( 'tlu_var_pod', var_ten(:,:,:,4)   , 'F', -1.)
+      CALL lbc_lnk_multi( 'tlu_var_pod', var_ten(:,:,:,5)   , 'U', -1.)
+      CALL lbc_lnk_multi( 'tlu_var_pod', var_ten(:,:,:,6)   , 'V', -1.)
 
    END SUBROUTINE tlu_var_pod
 

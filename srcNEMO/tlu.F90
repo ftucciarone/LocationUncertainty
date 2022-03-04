@@ -111,7 +111,7 @@ MODULE tlu
    !
    ! [tlu_Schmidt]
    REAL(wp),    PUBLIC, PARAMETER ::   SC = 1
-   REAL(wp),    PUBLIC, PARAMETER ::   r1_SC = 1._wp / sqrt(50._wp)
+   REAL(wp),    PUBLIC, PARAMETER ::   r1_SC = 1._wp / sqrt(1._wp)
    ! [tlu_Schmidt]
    !
    ! [tlu_Schmidt]
