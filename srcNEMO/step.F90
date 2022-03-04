@@ -167,7 +167,6 @@ CONTAINS
 
       IF( ln_tlu ) THEN
          IF( ln_tlu_svd)    CALL tlu_noi       ( kstp )  ! Compute the noise
-                            CALL tlu_isd
 !                            CALL tlu_wzvcmp
       END IF
 
