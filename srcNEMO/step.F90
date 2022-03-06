@@ -167,7 +167,7 @@ CONTAINS
 
       IF( ln_tlu ) THEN
          IF( ln_tlu_svd)    CALL tlu_noi       ( kstp )  ! Compute the noise
-!                            CALL tlu_wzvcmp
+                            CALL tlu_wzvcmp
       END IF
 
 
@@ -214,7 +214,7 @@ CONTAINS
 
       !Draw one realisation of noise from spatial POD modes [PC]
       IF( ln_tlu ) THEN
-!                           CALL tlu_bcdyn     ( kstp )  ! LU dynamics contributions [PC]
+                            CALL tlu_bcdyn     ( kstp )  ! LU dynamics contributions [PC]
 !                           CALL eigensum(nn_tco_dat, nm_mod_nc,tlu_lam_spc   )
 !                           CALL int2d_3c( var_ten(:,:,1,1), var_ten(:,:,1,2), var_ten(:,:,1,3), 'Variance', 1._wp/rn_rdt)
 !                           CALL int2d_ene3c( un(:,:,1), vn(:,:,1), wn(:,:,1), 'energy (velocity)', 1._wp)
