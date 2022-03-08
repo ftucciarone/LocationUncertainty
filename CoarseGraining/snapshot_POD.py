@@ -101,7 +101,6 @@ def spot_POD2F(U, V, wU, wV, check_POD):
 
     [nt, nu] = np.shape(U)
     # nv = np.shape(V[0, :])
-
     # Detrending
     Um = np.mean(U, axis=0)
     Vm = np.mean(V, axis=0)

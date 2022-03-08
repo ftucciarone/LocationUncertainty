@@ -1,15 +1,14 @@
 !! ------------------------------------------------------------------------------
 !! 
 !!                               Program: main
-!!   Coarse Graining procedure to create successful noise structures in the LU 
-!!   module
+!!   Template to open NetCDF files in Fortran90 with description of the operations
+!!   
 !!   
 !
 !> @authors
-!>                L. Li
+!>                F. Tucciarone
 !!
 !> @version
-!!                2020 -  ( L. LI           )  .f77 original code <br>
 !!                2021 -  ( F. TUCCIARONE   )  .F90 adaptation
 !! 
 !> @brief         Filtering routines        
@@ -22,13 +21,15 @@
 !!------------------------------------------------------------------------------
 PROGRAM main
 
-!    Modules
-   USE class_precision
-   USE ionml_subs
-   USE param    
-   USE state
-   USE ionc_subs
-   USE coarse_subs
+!  Modules
+   USE class_precision        ! Defines single and double precision
+   USE nmlsRD_subs            ! Manages the namelist
+   USE ncdfRD_subs            ! Reading netCDF routines
+   USE ncdfWR_subs            ! Writing netCDF routines
+   USE NEMO_nmconv            ! Defines NEMO conventions for naming
+
+   USE task_data
+   USE task_operations
 
    IMPLICIT NONE
    INCLUDE 'netcdf.inc'
@@ -36,154 +37,131 @@ PROGRAM main
    !-------------------------------------------------------------------------------------
    !   Local variables
    !-------------------------------------------------------------------------------------
-   REAL(kind = wp ), ALLOCATABLE, DIMENSION(:,:,:)  ::   uo,vo,wo  ! (m/s)
-   REAL(kind = wp ), ALLOCATABLE, DIMENSION(:,:,:)  ::   wtilde    ! (m/s)
-
-   REAL(kind = wp ), ALLOCATABLE, DIMENSION(:,:)    ::   utau,vtau ! (N/m^2)  
-   REAL(kind = wp ), ALLOCATABLE, DIMENSION(:,:)    ::   uwnd,vwnd ! (N/m^2)  
-
-   REAL(kind = wp ), ALLOCATABLE, DIMENSION(:,:)    ::   gfk
-   REAL(kind = wp )                                 ::   wtot 
-   INTEGER                                          ::   i,j
+   REAL(kind = wp ), ALLOCATABLE, DIMENSION(:,:) :: gfk
+   REAL(kind = wp )                              :: wtot 
+   INTEGER                                       :: idt, idz
+   INTEGER                                       :: ierr(3)
 
    !-------------------------------------------------------------------------------------
    !   netCDF variables 
    !-------------------------------------------------------------------------------------
-   CHARACTER (len=*), PARAMETER                    ::   subnam = 'main'
-   INTEGER                                         ::  status, iostat, file_unit
+   CHARACTER (len=*), PARAMETER                     :: subnam = 'main'
+   INTEGER                                          :: status, iostat, file_unit
 
    !-------------------------------------------------------------------------------------
    !   openMP Variables
    !-------------------------------------------------------------------------------------
-!$ INTEGER :: nprocs, OMP_GET_NUM_PROCS, nthmax, OMP_GET_MAX_THREADS
+   !$ INTEGER :: nprocs, OMP_GET_NUM_PROCS, nthmax, OMP_GET_MAX_THREADS
 
    !-------------------------------------------------------------------------------------
-   !   Reading namelist
+   !   Reading domain configuration and dimensions
    !-------------------------------------------------------------------------------------
-   NAMELIST/inout_param/ iodir, trcnam, uncnam, vncnam, wncnam, tggrid, outnam
-   NAMELIST/array_param/ nxto, nyto, nlo, nto, nso, co 
+   CALL rdnc_namelist ('namelist_ioNetCDF.nml')     ! Read address files
 
-   CALL open_inputfile('namelist_coarsegrain.nml', file_unit, iostat)
-   READ (NML=inout_param, IOSTAT=iostat, UNIT=file_unit)
-   READ (NML=array_param, IOSTAT=iostat, UNIT=file_unit)
-   CALL close_inputfile('namelist_coarsegrain.nml', file_unit, iostat)
- 
-   !  Derived grid parameters (do not alter)
-   !  -------------------------------------- 
-   nxpo  = nxto + 2   ! oceanic complete grid with boundaries in x 
-   nypo  = nyto + 2   ! oceanic complete grid with boundaries in y
-   nxtoc = nxto/nso   ! coarse inner gridcells in x
-   nytoc = nyto/nso   ! coarse inner gridcells in y
-   nxpoc = nxtoc + 2  ! complete coarse grid points in x
-   nypoc = nytoc + 2  ! complete coarse grid points in y
+   CALL readFileID (subnam, indir, uncnam, uncID)      ! R27 domain file
+   CALL readDim (subnam,             nm_x, uncID, nxR27)
+   CALL readDim (subnam,             nm_y, uncID, nyR27)
+   CALL readDim (subnam, TRIM(nm_z1)//'u', uncID,   nlo)
+   CALL readDim (subnam,             nm_t, uncID,   nto)
 
+   CALL readFileID (subnam, dmdir, dmgrid, domID)      !  R3 domain file
+   CALL readDim (subnam,             nm_x, domID,  nxR3)
+   CALL readDim (subnam,             nm_y, domID,  nyR3)
+   CALL readDim (subnam,      TRIM(nm_z2), domID,   nlo)
 
-   CALL state_init()
-   ALLOCATE( uo(nxpo,nypo,nlo),   &
-        &    vo(nxpo,nypo,nlo),   &
-        &    wo(nxpo,nypo,nlo),   &
-        &    wtilde(nxpo,nypo,nlo),   &
-        &    utau(nxpo,nypo),     &
-        &    vtau(nxpo,nypo),     &
-        &    uwnd(nxpo,nypo),     &
-        &    vwnd(nxpo,nypo),     &
-        &    gfk(2*co*nso+1,2*co*nso+1))
-
- 
-   print *, '*******************************************************'
-   print *, '****  Coarse-graining of eddy-resolving snapshots   ***'
-   print *, '*******************************************************'
-
-   !-------------------------------------------------------------------------------------
-   !   Examine openMP environment
-   !-------------------------------------------------------------------------------------
-!$    nprocs = OMP_GET_NUM_PROCS()
-!$    nthmax = OMP_GET_MAX_THREADS()
-!$    write(*,*) ' ' 
-!$    write(*,*) ' OpenMP parallelism is activated'
-!$    write(*,'(a,i5)') '   No. of processors available = ', nprocs
-!$    write(*,'(a,i3)') ' Max. no. of threads available = ', nthmax
-
-   !-------------------------------------------------------------------------------------
-   !   Initialize inputs
-   !-------------------------------------------------------------------------------------
-   ! Open netCDF file for T-grid 
-   status = nf_open (TRIM(iodir)//TRIM(trcnam), nf_nowrite, trcid) 
-   IF ( status.ne.NF_NOERR ) CALL handle_err (status, '['//subnam//'] '//trcnam)
-   ! Open netCDF file for U-grid 
-   status = nf_open (TRIM(iodir)//TRIM(uncnam), nf_nowrite, uncid) 
-   IF ( status.ne.NF_NOERR ) CALL handle_err (status, '['//subnam//'] '//uncnam)
-   ! Open netCDF file for V-grid 
-   status = nf_open (TRIM(iodir)//TRIM(vncnam), nf_nowrite, vncid)
-   IF ( status.ne.NF_NOERR ) CALL handle_err (status, '['//subnam//'] '//vncnam)
-   ! Open netCDF file for W-grid 
-   status = nf_open (TRIM(iodir)//TRIM(wncnam), nf_nowrite, wncid) 
-   IF ( status.ne.NF_NOERR ) CALL handle_err (status, '['//subnam//'] '//wncnam)
-
- 
-   ! This is to read the domain file
-   status = nf_open (TRIM(iodir)//TRIM(tggrid), nf_nowrite, domID) 
-   ! This will generate an identifier 'uncid' for input *.nc file
-   IF ( status.ne.NF_NOERR ) CALL handle_err (status, '['//subnam//'] '//tggrid)
-   CALL read_ini !! defined in 'ionc_subs.F'
    print *
-   print *, 'Input file initialized'
-
-   !-------------------------------------------------------------------------------------
-   !   Construct coarse grid
-   !-------------------------------------------------------------------------------------
-   !   x axis of p grid      
-!!      do i=1,nxpoc 
-!!        xpoc(i) = xpo(1+(i-1)*nso)
-!!      enddo
-  !   y axis of p grid        
-!!      do j=1,nypoc
-!!        ypoc(j) = ypo(1+(j-1)*nso)
-!!      enddo
+   print *, 'R27 Dimensions (nx,ny,nz): ', nxR27, nyR27, nlo
+   print *, ' R3 Dimensions (nx,ny,nz): ',  nxR3,  nyR3, nlo
+   print *, 'R27        Time axis (nt): ',   nto
+ 
+   CALL task_initR27 ('vel')   
+   CALL  task_initR3 ('all')
+   CALL   state_init ()
+ 
    !-------------------------------------------------------------------------------------
    !   Initialize outputs
    !-------------------------------------------------------------------------------------
    ! Create netCDF file
-   status = nf_create (TRIM(iodir)//TRIM(outnam), &
-          &            ior(nf_clobber,nf_64bit_offset), oncid)
-   ! This is used to create 'big-data'
-   IF ( status.ne.NF_NOERR ) CALL handle_err (status, '['//subnam//'] '//outnam)
-   CALL save_ini !! defined in 'ionc_subs.F'
-   print *, 'Output file created'
+   CALL wrnc_namelist ('namelist_ioNetCDF.nml')
+   CALL wrnc_init (subnam, outID)
+
    !-------------------------------------------------------------------------------------
-   !   Coarse-graining of input snapshots 
+   !   Derived grid parameters (do not alter)
    !-------------------------------------------------------------------------------------
+   nso   = 9          ! Resolutions Ratio 
+   nxpo  = nxR27      ! oceanic complete grid with boundaries in x 
+   nypo  = nyR27      ! oceanic complete grid with boundaries in y
+   nxto  = nxpo - 2   ! oceanic grid without boundaries in x 
+   nyto  = nypo - 2   ! oceanic grid without boundaries in x 
+   nxtoc = nxto / nso ! coarse inner gridcells in x
+   nytoc = nyto / nso ! coarse inner gridcells in y
+   nxpoc = nxtoc + 2  ! complete coarse grid points with boundaries in x
+   nypoc = nytoc + 2  ! complete coarse grid points with boundaries in y
+   co    = 2
+
+   ALLOCATE( gfk(2*co*nso+1,2*co*nso+1) )
   
    print *
-   print *, 'Generate Gaussian filter kernel'
-   call gaussf (gfk, wtot, 2*co*nso) !! defined in 'coarse_subs.F'
-   write(*,'(a,i2)') '  Width of Gaussian filter = ', 2*co*nso
+   print *,            '     Generate Gaussian filter kernel'
+
+   CALL gaussf (gfk, wtot, 2*co*nso)
+
+   write(*,'(a,i2)')   '         Width of Gaussian filter = ', 2*co*nso
    write(*,'(a,f6.3)') '  Total weight of Gaussian filter = ', wtot
 
-   print *
-   print *, 'Coarse-graining procedure'
-   print *, '========================='
 
+   !-------------------------------------------------------------------------------------
+   !   Reading Velocity fields
+   !-------------------------------------------------------------------------------------
+   ! Open netCDF file 
+   CALL readFileID (subnam, indir, trcnam, trcID)  ! T-grid
+   CALL readFileID (subnam, indir, uncnam, uncID)  ! U-grid
+   CALL readFileID (subnam, indir, vncnam, vncID)  ! V-grid
+   CALL readFileID (subnam, indir, wncnam, wncID)  ! W-grid
+
+   CALL    read2D_REALvar (subnam,  cn_ve2u, domID, e2uR3)
+   CALL    read2D_REALvar (subnam,  cn_ve1v, domID, e1vR3)
+   CALL    read2D_REALvar (subnam,  cn_ve1t, domID, e1tR3)
+   CALL    read2D_REALvar (subnam,  cn_ve2t, domID, e2tR3)
+   CALL read3Df4D_REALvar (subnam, cn_ve3u0, domID, e3uR3, 1)
+   CALL read3Df4D_REALvar (subnam, cn_ve3v0, domID, e3vR3, 1)
+   CALL read3Df4D_REALvar (subnam, cn_ve3t0, domID, e3tR3, 1)
+
+   !-------------------------------------------------------------------------------------
+   !   Examine openMP environment
+   !-------------------------------------------------------------------------------------
+   !$    nprocs = OMP_GET_NUM_PROCS()
+   !$    nthmax = OMP_GET_MAX_THREADS()
+   !$    write(*,*) ' ' 
+   !$    write(*,*) ' OpenMP parallelism is activated'
+   !$    write(*,'(a,i5)') '   No. of processors available = ', nprocs
+   !$    write(*,'(a,i3)') ' Max. no. of threads available = ', nthmax
+
+   !-------------------------------------------------------------------------------------
+   !   Initialize inputs
+   !-------------------------------------------------------------------------------------
    !
    !                                ! ================
-   DO i = 1, nto                    !  Time instant
+   DO idt = 1, nto                  !  Time instant
       !                             ! ================
       !
-      uo = 0._wp
-      vo = 0._wp
+      uf = 0._wp
+      vf = 0._wp
+      wf = 0._wp
       !
-      print *, 'Snapshot No. = ', i
+      print *, 'Snapshot No. = ', idt
       !
       !                             ! ================
-      DO j = 1, nlo                 ! Horizontal slab
+      DO idz = 1, nlo               ! Horizontal slab
          !                          ! ================
          !
          ! Read one eddy-resolving snapshot at one layer
-         call read_out (uo(:,:,j), vo(:,:,j), i, j) !! defined in 'ionc_subs.F'         !
-         ! Coarse-graining of horizontal velocities (defined in 'coarse_subs.F')
-         call filt (uf(:,:,j), ur(:,:,j), uo(:,:,j),                   & 
+         CALL read2Df4D_REALvar (subnam, cn_vozocrtx, uncID, uR27(:,:,idz), idz, idt)
+         CALL read2Df4D_REALvar (subnam, cn_vomecrty, vncID, vR27(:,:,idz), idz, idt)
+         !
+         call filt (uf(:,:,idz), ur(:,:,idz), uR27(:,:,idz),                   & 
               &     gfk, wtot, 2*co*nso, nxtoc-1, nytoc) 
-         call filt (vf(:,:,j), vr(:,:,j), vo(:,:,j),                   &
+         call filt (vf(:,:,idz), vr(:,:,idz), vR27(:,:,idz),                   &
               &     gfk, wtot, 2*co*nso, nxtoc, nytoc-1)
          !
          !                          ! ================
@@ -191,42 +169,22 @@ PROGRAM main
       !                             ! ================
       !
       ! Derive vertical velocities
-      CALL uv2w (wf, uf, vf)
-      CALL uv2w (wr, ur, vr)
+      CALL uv2w (wf, uf, vf, e1tR3, e2tR3, e1vR3, e2uR3, e3uR3, e3vR3, e3tR3, nxR3, nyR3)
+      CALL uv2w (wr, ur, vr, e1tR3, e2tR3, e1vR3, e2uR3, e3uR3, e3vR3, e3tR3, nxR3, nyR3)
       !
-      ! Read wind stress 
-      CALL read_out_sl (utau, vtau, i)
       !
-      ! Compute wind velocity
-      CALL tau2v (utau, uwnd)
-      CALL tau2v (vtau, vwnd)
-      !
-      ! Coarse-graining of horizontal velocities (defined in 'coarse_subs.F')
-      call filt (uwindf(:,:), uwindr(:,:), uwnd,                   & 
-           &     gfk, wtot, 2*co*nso, nxtoc-1, nytoc) 
-      call filt (vwindf(:,:), vwindr(:,:), vwnd,                   &
-           &     gfk, wtot, 2*co*nso, nxtoc, nytoc-1)
       !
       ! Save output file
-      CALL save_out (i) !! defined in 'ionc_subs.F'
+      CALL save_out (idt) !! defined in 'ionc_subs.F'
       !
       !                             ! ================
    END DO                           !  End of time
    !                                ! ================
-
-   !-------------------------------------------------------------------------------------
-   !   Close file and free all the resources
-   !-------------------------------------------------------------------------------------
-   status = nf_close (uncid)
-   if ( status.ne.NF_NOERR ) call handle_err (status, subnam)
-   status = nf_close (vncid)
-   if ( status.ne.NF_NOERR ) call handle_err (status, subnam)
-   status = nf_close (oncid)
-   if ( status.ne.NF_NOERR ) call handle_err (status, subnam)
-
    print *
    print *, '*******************************************************'
    print *, '******************  END of program   ******************'
    print *, '*******************************************************'
 
 END PROGRAM main    
+
+
