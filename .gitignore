@@ -2,6 +2,7 @@
 # Folders #
 ###########
 __pycache__/
+data/
 
 # Swap files #
 ##############
@@ -16,6 +17,7 @@ __pycache__/
 *.o
 *.so
 *.out
+*.mod
 
 # data and NetCDF #
 ###################
