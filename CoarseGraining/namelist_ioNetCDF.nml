@@ -11,7 +11,7 @@
    vncnam = "GYRE_5d_00010101_00021230_grid_V.nc"
    wncnam = "GYRE_5d_00010101_00021230_grid_W.nc"
     dmdir = ""
-   dmgrid = "domain_cfg_out.nc"
+   dmgrid = "data/domain_cfg_out.nc"
 /
 !-----------------------------------------------------------------------
 &dim_param            !   netCDF dimension names 
@@ -25,6 +25,6 @@
 !-----------------------------------------------------------------------
 &wrnc_param           !   Output netCDF
 !-----------------------------------------------------------------------
-   outdir = "108-110y/"
+   outdir = "data/108-110y/"
    outnam = "ocref_r3.nc"
 /
