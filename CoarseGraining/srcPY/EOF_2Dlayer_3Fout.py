@@ -22,9 +22,9 @@ import matplotlib.pyplot as plt
 # Set parammeters
 # ---------------
 # Inputs
-base_dir = ''  # '/Volumes/LaCie/Nemo/Data_Tuccia/R27/'
+base_dir = '/Users/ftucciar/LocationUncertainty/CoarseGraining/data/'
 subs_dir = ['']
-infile = 'trial.nc'
+infile = '2Dvel.nc'
 ingrid = 'domain_cfg_out.nc'
 # Outputs
 sfx = ['u', 'v', 'w']
@@ -35,7 +35,7 @@ single_file = 0
 check_opt = 1
 
 fin = Dataset(base_dir + subs_dir[0] + infile, 'r', format="NETCDF4")
-grid = Dataset(ingrid, 'r', format="NETCDF4")
+grid = Dataset(base_dir + ingrid, 'r', format="NETCDF4")
 
 # Get domain dimension from domain file
 # -----------------------------------------------------------------------
@@ -146,7 +146,7 @@ plt.show()
 # %% Saving .n files
 # Save output data
 # ----------------
-print('Preparing output file: ', outfile)
+print('Preparing output file: ', base_dir + 'spmXXXDF.nc')
 for dim in range(3):
     outfile = base_dir + 'spm' + sfx[dim] + 'DF.nc'
     print('Writing outputs in file: ', outfile)
@@ -182,4 +182,4 @@ for dim in range(3):
     fout.close()
 
 # %% Saving .dat file
-np.savetxt(base_dir + 'eigen_ModByLevs.dat', pc[:, :-1], delimiter=' ')
+np.savetxt(base_dir + 'eigen_ModByLevsDF.dat', pc[:, :-1], delimiter=' ')

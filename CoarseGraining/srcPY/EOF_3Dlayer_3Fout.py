@@ -3,7 +3,7 @@
 """
 Created on Fri Oct 22 11:02:13 2021
 
-         Computes the EOF through an Proper Orthogonal Decomposition 
+         Computes the EOF through an Proper Orthogonal Decomposition
          procedure starting of a 3D velocity field.
          Prints the output in 3 different files
 
@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 # Set parammeters
 # ---------------
 # Inputs
-base_dir = ''  # '/Volumes/LaCie/Nemo/Data_Tuccia/R27/'
+base_dir = '/Users/ftucciar/LocationUncertainty/CoarseGraining/data/'
 subs_dir = ['100-102y/', '102-104y/', '104-106y/', '106-108y/', '108-110y/']
 infile = 'ocref_r3.nc'
 ingrid = 'domain_cfg_out.nc'
@@ -35,7 +35,7 @@ single_file = 0
 check_opt = 1
 
 fin = nc.netcdf_file(base_dir + subs_dir[0] + infile, 'r')
-grid = nc.netcdf_file(ingrid, 'r')
+grid = nc.netcdf_file(base_dir + ingrid, 'r')
 
 # Get domain dimension from domain file
 # -----------------------------------------------------------------------
