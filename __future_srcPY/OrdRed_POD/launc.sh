@@ -1,1 +1,0 @@
- python3 EOF_BtBcSpt.py -prefix keLR -weight 0w1_36w2; python3 EOF_BtBcSpt.py -prefix keLR -weight 0w1_72w2; python3 EOF_BtBcSpt.py -prefix keLR -weight 36w1_72w2; python3 EOF_BtBcSpt.py -prefix keLR -weight 36w1_144w2;
