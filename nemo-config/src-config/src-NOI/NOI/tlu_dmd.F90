@@ -76,7 +76,7 @@ MODULE tludmd
    !
    ! [tlu_MedSea_dmd]
    INTEGER(i4)                                                :: jpk_ 
-   LOGICAL,                                        PARAMETER  :: only_bias = .false.
+   LOGICAL,       PUBLIC,                          PARAMETER  :: only_dmd_bias = .false.
    ! [tlu_MedSea_dmd]
    !
 CONTAINS
@@ -155,7 +155,7 @@ CONTAINS
          WRITE(numout,*) '        file opened to read modes         nm_mod_nc = ', nm_mod_nc
          WRITE(numout,*)
          WRITE(numout,*) '   Internal variables hardcoded (safety measure)      '
-         WRITE(numout,*) '                 Implementing noise and not only bias ', .not.only_bias
+         WRITE(numout,*) '                 Implementing noise and not only bias ', .not.only_dmd_bias
          WRITE(numout,*) '                   Number of internal vertical levels ', jpk_
       END IF
       !
@@ -163,7 +163,7 @@ CONTAINS
       !
       ierr = 0
       !
-      IF ( .not. only_bias) THEN
+      IF ( .not. only_dmd_bias) THEN
         !
         ALLOCATE(   dmd_rxmd_r(jpi,jpj,nn_tlu_nmod_r * jpk_), &
         &           dmd_rymd_r(jpi,jpj,nn_tlu_nmod_r * jpk_), &
@@ -291,7 +291,7 @@ CONTAINS
       !
       CALL readFileID ("read_vel_md", '', nm_mod_nc, ncID)
       !
-      IF ( .not. only_bias) THEN
+      IF ( .not. only_dmd_bias) THEN
         !
         dmd_rxmd_r = 0._wp
         dmd_rymd_r = 0._wp
@@ -793,4 +793,6 @@ CONTAINS
 
    END SUBROUTINE handle_err
 
+
 END MODULE tludmd
+
