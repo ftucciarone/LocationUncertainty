@@ -75,9 +75,8 @@ MODULE tludmd
    ! [tlu_noiseodes]
    !
    ! [tlu_MedSea_dmd]
-   INTEGER(i4),                                    PARAMETER  :: jpk_ = 1
-   INTEGER(i4),                                    PARAMETER  :: jpk_ = jpk
-   LOGICAL,                                        PARAMETER  :: only_bias = .true.
+   INTEGER(i4)                                                :: jpk_ 
+   LOGICAL,                                        PARAMETER  :: only_bias = .false.
    ! [tlu_MedSea_dmd]
    !
 CONTAINS
@@ -130,9 +129,11 @@ CONTAINS
       ! Read namelist: transport under location uncertainty parametrization
       !
       NAMELIST/namtlu_dmd/   nm_mod_nc,       &
-                         &   nn_tlu_nmod_r,   &
-                         &   nn_tlu_nmod_c,   & 
-                         &   biaSIGN
+      &                      nn_tlu_nmod_r,   &
+      &                      nn_tlu_nmod_c,   & 
+      &                      biaSIGN
+      !
+      jpk_ = jpk
       !
       ! Read namelist
       !
@@ -152,20 +153,25 @@ CONTAINS
          WRITE(numout,*) '     number of uncorrelated modes     nn_tlu_nmod_r = ', nn_tlu_nmod_r
          WRITE(numout,*) '     number of   correlated modes     nn_tlu_nmod_c = ', nn_tlu_nmod_c
          WRITE(numout,*) '        file opened to read modes         nm_mod_nc = ', nm_mod_nc
+         WRITE(numout,*)
+         WRITE(numout,*) '   Internal variables hardcoded (safety measure)      '
+         WRITE(numout,*) '                 Implementing noise and not only bias ', .not.only_bias
+         WRITE(numout,*) '                   Number of internal vertical levels ', jpk_
       END IF
       !
       ! Allocate Spatial modes
       !
+      ierr = 0
+      !
       IF ( .not. only_bias) THEN
         !
-        ierr = 0
         ALLOCATE(   dmd_rxmd_r(jpi,jpj,nn_tlu_nmod_r * jpk_), &
         &           dmd_rymd_r(jpi,jpj,nn_tlu_nmod_r * jpk_), &
         &           dmd_rzmd_r(jpi,jpj,nn_tlu_nmod_r * jpk_), &
         &           dmd_ixmd_r(jpi,jpj,nn_tlu_nmod_r * jpk_), &
         &           dmd_iymd_r(jpi,jpj,nn_tlu_nmod_r * jpk_), &
         &           dmd_izmd_r(jpi,jpj,nn_tlu_nmod_r * jpk_), &
-        &              omega_r(        nn_tlu_nmod_r      ), stat=ierr(1) )
+        &              omega_r(        nn_tlu_nmod_r       ), stat=ierr(1) )
         !
         ! Allocate Brownian motion
         !
@@ -186,7 +192,7 @@ CONTAINS
          &         dmd_rymd_c(jpi,jpj,nn_tlu_nmod_c * jpk_), &
          &         dmd_ixmd_c(jpi,jpj,nn_tlu_nmod_c * jpk_), &
          &         dmd_iymd_c(jpi,jpj,nn_tlu_nmod_c * jpk_), &
-         &            omega_c(        nn_tlu_nmod_c      ),  stat=ierr(3) )
+         &            omega_c(        nn_tlu_nmod_c       ),  stat=ierr(3) )
          !
          ! Allocate Spatial modes
          !
@@ -283,46 +289,50 @@ CONTAINS
       val_r = 0.25_wp
       val_c = 0.125_wp
       !
-      dmd_rxmd_r = 0._wp
-      dmd_rymd_r = 0._wp
-      dmd_rzmd_r = 0._wp
-      dmd_ixmd_r = 0._wp
-      dmd_iymd_r = 0._wp
-      dmd_izmd_r = 0._wp
-      !
-      !
       CALL readFileID ("read_vel_md", '', nm_mod_nc, ncID)
-      !  
-      DO jm = 1,nn_tlu_nmod_r
-         !
-         ! Define zero-th indexed mode
-         !
-         m_idx = ( jm - 1 ) * jpk_ 
-         !
-         ! Read real parts of Random components
-         !
-         CALL read3Df4D_REALvar ("read_vel_md", "umode_real_r", ncID, dmd_rxmd_r(:,:,m_idx + 1 : m_idx + jpk_ ), (jm-1)*2 + 1 )
-         CALL read3Df4D_REALvar ("read_vel_md", "vmode_real_r", ncID, dmd_rymd_r(:,:,m_idx + 1 : m_idx + jpk_ ), (jm-1)*2 + 1 )
-         CALL read3Df4D_REALvar ("read_vel_md", "wmode_real_r", ncID, dmd_rzmd_r(:,:,m_idx + 1 : m_idx + jpk_ ), (jm-1)*2 + 1 )
-         !
-         ! Read imaginary parts of Random component
-         !
-         CALL read3Df4D_REALvar ("read_vel_md", "umode_imag_r", ncID, dmd_ixmd_r(:,:,m_idx + 1 : m_idx + jpk_ ), (jm-1)*2 + 1 )
-         CALL read3Df4D_REALvar ("read_vel_md", "vmode_imag_r", ncID, dmd_iymd_r(:,:,m_idx + 1 : m_idx + jpk_ ), (jm-1)*2 + 1 )
-         CALL read3Df4D_REALvar ("read_vel_md", "wmode_imag_r", ncID, dmd_izmd_r(:,:,m_idx + 1 : m_idx + jpk_ ), (jm-1)*2 + 1 )
-         !
-         dmd_rxmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) = dmd_rxmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) * umask * val_r
-         dmd_rymd_r(:,:,m_idx + 1 : m_idx + jpk_ ) = dmd_rymd_r(:,:,m_idx + 1 : m_idx + jpk_ ) * vmask * val_r
-         dmd_rzmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) = dmd_rzmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) * wmask * val_r
-         dmd_ixmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) = dmd_ixmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) * umask * val_r
-         dmd_iymd_r(:,:,m_idx + 1 : m_idx + jpk_ ) = dmd_iymd_r(:,:,m_idx + 1 : m_idx + jpk_ ) * vmask * val_r
-         dmd_izmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) = dmd_izmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) * wmask * val_r
-         !
-      END DO
       !
-      ! Read frequency vector
-      !
-      CALL read1D_REALvar ("read_vel_md", "omega_r", ncID, omega_r)
+      IF ( .not. only_bias) THEN
+        !
+        dmd_rxmd_r = 0._wp
+        dmd_rymd_r = 0._wp
+        dmd_rzmd_r = 0._wp
+        dmd_ixmd_r = 0._wp
+        dmd_iymd_r = 0._wp
+        dmd_izmd_r = 0._wp
+        !
+        !  
+        DO jm = 1,nn_tlu_nmod_r
+           !
+           ! Define zero-th indexed mode
+           !
+           m_idx = ( jm - 1 ) * jpk_ 
+           !
+           ! Read real parts of Random components
+           !
+           CALL read3Df4D_REALvar ("read_vel_md", "umode_real_r", ncID, dmd_rxmd_r(:,:,m_idx + 1 : m_idx + jpk_ ), (jm-1)*2 + 1 )
+           CALL read3Df4D_REALvar ("read_vel_md", "vmode_real_r", ncID, dmd_rymd_r(:,:,m_idx + 1 : m_idx + jpk_ ), (jm-1)*2 + 1 )
+           CALL read3Df4D_REALvar ("read_vel_md", "wmode_real_r", ncID, dmd_rzmd_r(:,:,m_idx + 1 : m_idx + jpk_ ), (jm-1)*2 + 1 )
+           !
+           ! Read imaginary parts of Random component
+           !
+           CALL read3Df4D_REALvar ("read_vel_md", "umode_imag_r", ncID, dmd_ixmd_r(:,:,m_idx + 1 : m_idx + jpk_ ), (jm-1)*2 + 1 )
+           CALL read3Df4D_REALvar ("read_vel_md", "vmode_imag_r", ncID, dmd_iymd_r(:,:,m_idx + 1 : m_idx + jpk_ ), (jm-1)*2 + 1 )
+           CALL read3Df4D_REALvar ("read_vel_md", "wmode_imag_r", ncID, dmd_izmd_r(:,:,m_idx + 1 : m_idx + jpk_ ), (jm-1)*2 + 1 )
+           !
+           dmd_rxmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) = dmd_rxmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) * umask * val_r
+           dmd_rymd_r(:,:,m_idx + 1 : m_idx + jpk_ ) = dmd_rymd_r(:,:,m_idx + 1 : m_idx + jpk_ ) * vmask * val_r
+           dmd_rzmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) = dmd_rzmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) * wmask * val_r
+           dmd_ixmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) = dmd_ixmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) * umask * val_r
+           dmd_iymd_r(:,:,m_idx + 1 : m_idx + jpk_ ) = dmd_iymd_r(:,:,m_idx + 1 : m_idx + jpk_ ) * vmask * val_r
+           dmd_izmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) = dmd_izmd_r(:,:,m_idx + 1 : m_idx + jpk_ ) * wmask * val_r
+           !
+        END DO
+        !
+        ! Read frequency vector
+        !
+        CALL read1D_REALvar ("read_vel_md", "omega_r", ncID, omega_r)
+        !
+      END IF
       !
       ! Read bias (if flagged)
       !
@@ -513,7 +523,7 @@ CONTAINS
    SUBROUTINE tlu_bia2D_dmd( kt, freq )
       INTEGER,                            INTENT(in   ) :: kt
       REAL(wp), DIMENSION(nn_tlu_nmod_c), INTENT(in   ) :: freq
-      INTEGER                                           :: jm
+      INTEGER                                           :: jm, jk
       !
       REAL(wp), DIMENSION(jpi,jpj)                      :: ubia_
       REAL(wp), DIMENSION(jpi,jpj)                      :: vbia_
