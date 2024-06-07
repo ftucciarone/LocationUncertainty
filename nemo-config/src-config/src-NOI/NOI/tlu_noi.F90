@@ -227,7 +227,7 @@ CONTAINS
       !
       IF ( ln_tlu_dmd ) THEN
          ! 
-         IF( (kt == nit000 + dt_delay ) .and. ( .not. only_dmd_bias) ) THEN      ! Stationary assumption here
+         IF( (kt == nit000 + dt_delay ) .and. ( .not. only_dmd_bias ) ) THEN      ! Stationary assumption here
             !
             ! Compute the variance tensor a = sum_{k} \phi_{k}^{0}\phi_{k}^{0} * dt and Ito-Stokes drift
             !
@@ -248,7 +248,7 @@ CONTAINS
          ! 
          ! Create one realisation of sigma dBt = sum_{k} \phi_{k} \xi_{k}
          !
-         IF ( .not. only_dmd_bias) THEN
+         IF ( .not. only_dmd_bias ) THEN
            !
            CALL tlu_tcoef_dmd( kt,   rtime_coef,    itime_coef )
            CALL tlu_noi( dmd_rxmd_r, dmd_rymd_r, nn_tlu_nmod_r, rtime_coef,  .FALSE. )
@@ -386,6 +386,10 @@ CONTAINS
          CALL iom_put( "ubia_n", ubia_n )
          CALL iom_put( "vbia_n", vbia_n )
          CALL iom_put( "wbia_n", wbia_n )
+         !
+         ubia_n = 0.75 * ubia_n
+         vbia_n = 0.75 * vbia_n
+         wbia_n = 0.75 * wbia_n
          !
       END IF
       !
