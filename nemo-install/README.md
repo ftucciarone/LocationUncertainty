@@ -11,3 +11,4 @@ To build the containers, and run nemo, run in a shell
 ```shell
 make all
 ```
+https://github.com/rcaneill/xnemogcm_test_data
