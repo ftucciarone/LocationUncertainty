@@ -294,22 +294,7 @@ CONTAINS
          unoi = wlx_noi * umask
          vnoi = wly_noi * vmask
          !
-      END IF 
-      !
-      ! Gaussian white noise
-      !
-      IF ( ln_tlu_gss ) THEN
-         !
-         ! Generate the random modes
-         !
-         CALL gen_white_noise( kt )
-         !
-         unoi = u_wht * umask
-         vnoi = v_wht * vmask
-         !          
-         IF ( ln_pyp ) CALL tlu_tnsf_isd  
-         !
-      END IF   
+      END IF
       !
       ! Compute vertical components
       !
@@ -326,7 +311,26 @@ CONTAINS
          IF (ln_tlu_bia) CALL tlu_vel_proj( ubia_n, vbia_n, wbia_n, ubia_n, vbia_n, wbia_n )
          IF (ln_tlu_bia) wbia_n(:,:,1) = 0._wp
          !
-      END IF
+      END IF      
+      !
+      ! Gaussian white noise
+      !
+      IF ( ln_tlu_gss ) THEN
+         !
+         ! Generate the random modes
+         !
+         CALL gen_white_noise( kt )
+         !
+         unoi = unoi + u_wht * umask
+         vnoi = vnoi * v_wht * vmask
+         !
+         CALL build_vmodes(w_wht, u_wht, v_wht)
+         wnoi = wnoi + w_wht * wmask
+         
+         !          
+         IF ( ln_pyp ) CALL tlu_tnsf_isd  
+         !
+      END IF   
       ! 
       ! Rescale the noise by some manipulation
       ! dBt = C * (      sum_{k} \phi_{k} \xi_{k} )
