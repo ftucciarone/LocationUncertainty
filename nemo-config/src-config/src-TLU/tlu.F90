@@ -151,6 +151,7 @@ MODULE tlu
                                                               &  RESHAPE((/ 1,4,5, 4,2,6, 5,6,3 /), (/ 3, 3 /))
    !
    !
+   LOGICAL,     PUBLIC            ::   ld_tlu                       !< @public internal ln_tlu_ to handle delay
    INTEGER,     PUBLIC            ::   dt_delay = 5 * 360 * 86400                       ! 
    !
    INTEGER,     PUBLIC, PARAMETER ::   np_ucmp = 1                                   ! to calculate U contributions
@@ -245,6 +246,7 @@ CONTAINS
       END IF
       !
       ierr = 0
+      ld_tlu = ld_tlu
       IF ( ln_tlu ) THEN      
          !
          ! Check multiple method 
