@@ -229,7 +229,9 @@ CONTAINS
          WRITE(numout,*) '       noise rescaling based on kin. enrgy   ln_tlu_nke = ', ln_tlu_nke
          WRITE(numout,*) '                       Girsanov correction   ln_tlu_bia = ', ln_tlu_bia
          WRITE(numout,*)
-         WRITE(numout,*) '   Reduced Order Model '
+         WRITE(numout,*) '             Stochastic model delay (days)     dt_delay =  ', dt_delay/86400
+         WRITE(numout,*)
+         WRITE(numout,*) '       Noise Model '
          WRITE(numout,*) '           Proper Orthogonal Decomposition   ln_tlu_pod = ', ln_tlu_pod
          WRITE(numout,*) '              Dynamical Mode Decomposition   ln_tlu_dmd = ', ln_tlu_dmd
          WRITE(numout,*) '        Data-Free Pseudo-Observation Model   ln_tlu_pso = ', ln_tlu_pso
