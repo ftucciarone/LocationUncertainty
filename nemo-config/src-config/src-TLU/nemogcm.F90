@@ -465,7 +465,7 @@ CONTAINS
                            !                 ! both of them are needed if you want to delay lu
       IF ( ln_tlu )        CALL tlu_tra_adv_init  ! horizontal & vertical advection
                            CALL tra_adv_init      ! horizontal & vertical advection
-      END IF      
+
                            CALL tra_ldf_init      ! lateral mixing
 
 
@@ -713,5 +713,3 @@ CONTAINS
 
    !!======================================================================
 END MODULE nemogcm
-
-
