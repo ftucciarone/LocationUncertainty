@@ -103,7 +103,6 @@ MODULE tlu
    ! [public_sub]  
    !
    ! [public_vars]
-   !
    LOGICAL,     PUBLIC                                        :: ln_tlu     = .FALSE.    !< @public Switch for Location Uncertainty (LU)
    LOGICAL,     PUBLIC                                        :: ln_pyp     = .TRUE.     !< @public Switch for projection on isopycnals
    LOGICAL,     PUBLIC                                        :: ln_tlu_nke = .FALSE.    !< @public Switch for ke rescaling 
@@ -150,10 +149,10 @@ MODULE tlu
    !
    INTEGER(i4), PUBLIC, PARAMETER,         DIMENSION(3,3)     :: ndiffidx  = &             !: the indices of tensor var_ten 4th dim
                                                               &  RESHAPE((/ 1,4,5, 4,2,6, 5,6,3 /), (/ 3, 3 /))
-   
    !
-   INTEGER,     PUBLIC            ::   dt_delay = 0 * 360 * 86400                       ! 
    !
+   LOGICAL,     PUBLIC            ::   ld_tlu                       !< @public internal ln_tlu_ to handle delay
+   INTEGER,     PUBLIC            ::   dt_delay = 5 * 360 * 86400                       ! 
    !
    INTEGER,     PUBLIC, PARAMETER ::   np_ucmp = 1                                   ! to calculate U contributions
    INTEGER,     PUBLIC, PARAMETER ::   np_vcmp = 2                                   ! to calculate V contributions
@@ -231,7 +230,9 @@ CONTAINS
          WRITE(numout,*) '       noise rescaling based on kin. enrgy   ln_tlu_nke = ', ln_tlu_nke
          WRITE(numout,*) '                       Girsanov correction   ln_tlu_bia = ', ln_tlu_bia
          WRITE(numout,*)
-         WRITE(numout,*) '   Reduced Order Model '
+         WRITE(numout,*) '             Stochastic model delay (days)     dt_delay =  ', dt_delay/86400
+         WRITE(numout,*)
+         WRITE(numout,*) '       Noise Model '
          WRITE(numout,*) '           Proper Orthogonal Decomposition   ln_tlu_pod = ', ln_tlu_pod
          WRITE(numout,*) '              Dynamical Mode Decomposition   ln_tlu_dmd = ', ln_tlu_dmd
          WRITE(numout,*) '        Data-Free Pseudo-Observation Model   ln_tlu_pso = ', ln_tlu_pso
@@ -245,6 +246,7 @@ CONTAINS
       END IF
       !
       ierr = 0
+      ld_tlu = ld_tlu
       IF ( ln_tlu ) THEN      
          !
          ! Check multiple method 
@@ -351,12 +353,9 @@ CONTAINS
          END IF
          !
       END IF
+      !
    END SUBROUTINE tlu_init
    ! [tlu_init]
 
 END MODULE tlu
-
-
-
-
 
