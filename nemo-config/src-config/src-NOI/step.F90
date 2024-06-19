@@ -165,8 +165,9 @@ CONTAINS
 
 
 
-      IF( ln_tlu ) THEN
-                            CALL tlu_fields       ( kstp )  ! Compute the noise
+      IF( ln_tlu ) ld_tlu = .true.
+      IF( ld_tlu ) THEN
+         IF( ld_tlu )        CALL tlu_fields       ( kstp )  ! Compute the noise
       END IF
 
 
