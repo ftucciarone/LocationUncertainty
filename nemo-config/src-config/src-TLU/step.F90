@@ -165,9 +165,9 @@ CONTAINS
 
 
 
-      IF( kstp == nit000 + dt_delay ) ln_tlu = .true.
-      IF( ln_tlu ) THEN
-         IF( ln_tlu )        CALL tlu_fields       ( kstp )  ! Compute the noise
+      IF( (ln_tlu) .and. (kstp == nit000 + dt_delay) ) ld_tlu = .true.
+      IF( ld_tlu ) THEN
+         IF( ld_tlu )        CALL tlu_fields       ( kstp )  ! Compute the noise
                              CALL tlu_wzvcmp
       END IF
 
@@ -198,13 +198,13 @@ CONTAINS
       IF(.NOT. Agrif_Root())  & 
                &         CALL Agrif_Sponge_dyn        ! momentum sponge
 #endif
-      IF( ln_tlu) THEN
+      IF( ld_tlu ) THEN
                          CALL tlu_dyn_adv   ( kstp )           ! LU advection (vector or flux form)
       ELSE
                          CALL dyn_adv       ( kstp )           ! advection (vector or flux form)
       END IF  
                          CALL dyn_vor       ( kstp )           ! vorticity term including Coriolis
-      IF( ln_tlu )       CALL tlu_stpdyn    ( kstp, 'QG' )     ! LU coriolis term
+      IF( ld_tlu )       CALL tlu_stpdyn    ( kstp, 'QG' )     ! LU coriolis term
                          CALL dyn_ldf       ( kstp )           ! lateral mixing
       IF( ln_zdfosm  )   CALL dyn_osm       ( kstp )           ! OSMOSIS non-local velocity fluxes
                          CALL dyn_hpg       ( kstp )           ! horizontal gradient of Hydrostatic pressure
@@ -263,7 +263,7 @@ CONTAINS
 #endif
 
 
-      IF( ln_tlu) THEN
+      IF( ld_tlu ) THEN
                          CALL tlu_tra_adv   ( kstp )          ! horizontal & vertical advection
       ELSE
                          CALL tra_adv       ( kstp )          ! horizontal & vertical advection
@@ -283,13 +283,13 @@ CONTAINS
 
 
 
-     ! IF( ln_tlu )
+     ! IF( ld_tlu )
                          CALL tlu_tvor      ( kstp, 2, un, vn )  ! Vorticity computation: 1 = planetary, 
                                                                  !                        2 = dynamical,
                                                                  !                        3 = planetary + dynamical,
                                                                  !                        4 = potential (pl+dyn)/h
 
-!     IF( ln_tlu .and. kstp == 3)       CALL noise_energy(  )
+!     IF( ld_tlu .and. kstp == 3)       CALL noise_energy(  )
 
 
       !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
