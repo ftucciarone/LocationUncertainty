@@ -246,7 +246,7 @@ CONTAINS
       END IF
       !
       ierr = 0
-      ld_tlu = ld_tlu
+      ld_tlu = ln_tlu
       IF ( ln_tlu ) THEN      
          !
          ! Check multiple method 
