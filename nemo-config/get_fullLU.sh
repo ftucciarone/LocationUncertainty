@@ -1,3 +1,13 @@
+#
+# Downloads the file directly from Github without needing git
+#
+RUN_DIR=def_JAMES
+RUN_CONFIG=R3_det
+
+SRC_DIR=/home/${USER}/${RUN_DIR}/cfgs/${RUN_CONFIG}/MY_SRC
+
+cd ${SRC_DIR}
+
 TOKEN="Authorization: token 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"
 SOURCE=https://raw.githubusercontent.com/ftucciarone/LocationUncertainty/main/nemo-config/src-config/
 
