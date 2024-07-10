@@ -67,3 +67,27 @@ First, replace `EXTERNAL` with `INTRINSIC` in `/tools/REBUILD_NEMO/src/rebuild_n
 ```
 curl -H 'Authorization: token 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' -H 'Accept: application/vnd.github.v3.raw' -O -L https://github.com/ftucciarone/LocationUncertainty
 ```
+
+## Launch on POPOV
+Example of `./R3_launch.sh` (made executable with `chmod u+x R3_launch.sh`)
+```
+NPROCS=15
+
+RUN_DIR=def_JAMES
+RUN_CONFIG=R3_det
+MODE=EXP00
+
+export LD_LIBRARY_PATH=/home/ftucciar/nemo-base/lib/
+HOME=/home/${USER}
+
+RUN_DIR=${HOME}/${RUN_DIR}/cfgs/${RUN_CONFIG}/${MODE}
+
+cd ${RUN_DIR}
+echo 'localhost slots='${NPROCS} > hostfile
+date > t-tic
+mpirun -hostfile hostfile -np ${NPROCS} ./nemo
+date > t-toc
+```
+and then launch with detached screen 
+`screen -d -m -S R3_det "./R3_launch.sh"`
+(utility to chech the running is `screen -list`, to kill is `screen -XS <numeric-id> quit`
