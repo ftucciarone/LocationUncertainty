@@ -61,6 +61,7 @@ src-config/
 First, replace `EXTERNAL` with `INTRINSIC` in `/tools/REBUILD_NEMO/src/rebuild_nemo.F90`, then launch \
 `./maketools -m 'local' -n 'REBUILD_NEMO' -j 32;`
 
-
+## Download of this repository
+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
 
  
