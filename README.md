@@ -62,6 +62,8 @@ First, replace `EXTERNAL` with `INTRINSIC` in `/tools/REBUILD_NEMO/src/rebuild_n
 `./maketools -m 'local' -n 'REBUILD_NEMO' -j 32;`
 
 ## Download of this repository
-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
+`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`
 
- 
+```
+curl -H 'Authorization: token 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' -H 'Accept: application/vnd.github.v3.raw' -O -L https://github.com/ftucciarone/LocationUncertainty
+```
