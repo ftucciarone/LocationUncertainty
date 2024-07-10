@@ -47,3 +47,13 @@ src-config/
 ```
 ## Docker
 
+
+## Compilation of NEMO
+ ./makenemo -m 'local' -r GYRE_PISCES -n 'Your_Config_Name' -j 32;
+## Compilation of REBUILD_NEMO
+First, replace `EXTERNAL` with `INTRINSIC` in `/tools/REBUILD_NEMO/src/rebuild_nemo.F90`, then launch 
+ cd tools; ./maketools -m 'local' -n 'REBUILD_NEMO' -j 32;
+
+
+
+ 
