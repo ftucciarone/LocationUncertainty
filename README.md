@@ -88,6 +88,6 @@ date > t-tic
 mpirun -hostfile hostfile -np ${NPROCS} ./nemo
 date > t-toc
 ```
-and then launch with detached screen 
-`screen -d -m -S R3_det "./R3_launch.sh"`
+and then launch with detached screen \
+`screen -d -m -S R3_det "./R3_launch.sh"` \
 (utility to chech the running is `screen -list`, to kill is `screen -XS <numeric-id> quit`
