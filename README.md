@@ -60,6 +60,14 @@ src-config/
 `cd ~/nemo_dir/tools` \
 First, replace `EXTERNAL` with `INTRINSIC` in `/tools/REBUILD_NEMO/src/rebuild_nemo.F90`, then launch \
 `./maketools -m 'local' -n 'REBUILD_NEMO' -j 32;`
+The rebuild procedure needs a `nam_rebuild` file to be read, that has the following structure
+```
+&nam_rebuild
+filebase='GYRE_det_5d_00010101_00151230_grid_T'
+ndomain=15
+/
+```
+
 
 ## Download of this repository
 `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`
