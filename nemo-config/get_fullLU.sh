@@ -30,7 +30,7 @@ curl -H "${TOKEN}" -H 'Accept: application/vnd.github.v3.raw' -O -L ${SOURCE}/sr
 curl -H "${TOKEN}" -H 'Accept: application/vnd.github.v3.raw' -O -L ${SOURCE}/src-TLU/nemogcm.F90
 
 # Diagnostic
-curl -H "${TOKEN}" -H 'Accept: application/vnd.github.v3.raw' -O -L ${SOURCE}/src-TLU/DGN/tlu_dia.F90
+#curl -H "${TOKEN}" -H 'Accept: application/vnd.github.v3.raw' -O -L ${SOURCE}/src-TLU/DGN/tlu_dia.F90 # OBSOLETE
 curl -H "${TOKEN}" -H 'Accept: application/vnd.github.v3.raw' -O -L ${SOURCE}/src-TLU/DGN/tlu_nke.F90
 curl -H "${TOKEN}" -H 'Accept: application/vnd.github.v3.raw' -O -L ${SOURCE}/src-TLU/DGN/tludgns.F90
 
