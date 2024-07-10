@@ -77,7 +77,10 @@ RUN_DIR=def_JAMES
 RUN_CONFIG=R3_det
 MODE=EXP00
 
+# Choose one, those are different setups for different machines
+export LD_LIBRARY_PATH=/home/${USER}/NEMO/installs/lib/
 export LD_LIBRARY_PATH=/home/${USER}/nemo-base/lib/
+
 HOME=/home/${USER}
 
 RUN_DIR=${HOME}/${RUN_DIR}/cfgs/${RUN_CONFIG}/${MODE}
