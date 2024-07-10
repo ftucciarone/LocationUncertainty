@@ -20,6 +20,8 @@ curl -H "${TOKEN}" -H 'Accept: application/vnd.github.v3.raw' -O -L ${SOURCE}/sr
 curl -H "${TOKEN}" -H 'Accept: application/vnd.github.v3.raw' -O -L ${SOURCE}/src-NOI/NOI/tlu_prj.F90
 curl -H "${TOKEN}" -H 'Accept: application/vnd.github.v3.raw' -O -L ${SOURCE}/src-NOI/NOI/tlu_pso.F90
 curl -H "${TOKEN}" -H 'Accept: application/vnd.github.v3.raw' -O -L ${SOURCE}/src-NOI/NOI/tlu_rnd.F90
+curl -H "${TOKEN}" -H 'Accept: application/vnd.github.v3.raw' -O -L ${SOURCE}/src-NOI/NOI/__future_tlu_wlt.F90
+mv __future_tlu_wlt.F90 tlu_wlt.F90
 
 # Base configuration
 curl -H "${TOKEN}" -H 'Accept: application/vnd.github.v3.raw' -O -L ${SOURCE}/src-TLU/tlu.F90
