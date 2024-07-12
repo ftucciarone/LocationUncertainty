@@ -77,7 +77,7 @@ curl -H 'Authorization: token github_pat_11AKOBVUQ0Y33fDJGLAS4k_rPZdY48stMPsWFsJ
 ```
 
 ## Launch on POPOV
-$\color{red}{\text{\textbf{WARNING:}}}$ POPOV does not like to be told the -host option, it messes up the tiling of NEMO for the subdomains \
+$\color{red}{\text{\textbf{WARNING:}}}$ POPOV does not like to be told the -host option, it messes up the tiling of NEMO for the subdomains 
 
 Example of `./R3_launch.sh` (made executable with `chmod u+x R3_launch.sh`)
 ```
@@ -96,9 +96,8 @@ HOME=/home/${USER}
 RUN_DIR=${HOME}/${RUN_DIR}/cfgs/${RUN_CONFIG}/${MODE}
 
 cd ${RUN_DIR}
-echo 'localhost slots='${NPROCS} > hostfile
 date > t-tic
-mpirun -hostfile hostfile -np ${NPROCS} ./nemo
+mpirun -np ${NPROCS} ./nemo
 date > t-toc
 ```
 and then launch with detached screen \
