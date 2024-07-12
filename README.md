@@ -77,7 +77,8 @@ curl -H 'Authorization: token github_pat_11AKOBVUQ0Y33fDJGLAS4k_rPZdY48stMPsWFsJ
 ```
 
 ## Launch on POPOV
-$\color{blue}{\text{some text}}$
+$\color{red}{\text{\textbf{WARNING:}}}$ POPOV does not like to be told the -host option, it messes up the tiling of NEMO for the subdomains \
+
 Example of `./R3_launch.sh` (made executable with `chmod u+x R3_launch.sh`)
 ```
 NPROCS=15
