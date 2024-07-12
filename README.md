@@ -77,7 +77,7 @@ curl -H 'Authorization: token github_pat_11AKOBVUQ0Y33fDJGLAS4k_rPZdY48stMPsWFsJ
 ```
 
 ## Launch on POPOV
-<span style="color:red">some **This is Red Bold.** text</span>
+$\color{blue}{\text{some text}}$
 Example of `./R3_launch.sh` (made executable with `chmod u+x R3_launch.sh`)
 ```
 NPROCS=15
