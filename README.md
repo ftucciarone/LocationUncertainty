@@ -100,7 +100,7 @@ date > t-tic
 mpirun -np ${NPROCS} ./nemo
 date > t-toc
 ```
-and then launch with detached screen \
+and then launch with detached screen 
 ```
 screen -d -m -S R3_det "./R3_launch.sh"
 ```
