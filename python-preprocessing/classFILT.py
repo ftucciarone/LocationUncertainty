@@ -2,6 +2,7 @@
 
 import numpy as np
 import scipy.ndimage
+from scipy import signal
 from netCDF4 import Dataset
     
 
@@ -42,6 +43,52 @@ def SpatialDownsample(hres, lres, field, fnam=None):
     return fds
 
 
+def SpatialFiltering(hres, lres, scal, field, fnam=None):
+    """   
+
+       Name    : SpatialFiltering
+       Purpose : Applies given spatial filter to a given field
+
+    Parameters
+    ----------
+          hres : int,     Original resolution (that of field)
+          lres : int,     Target resolution (that of flt)
+          scal : double,  Scaling parameter for sigma
+         field : double,  Input field of resolution hres
+        
+
+       Returns
+       -------
+           flp : double,  Filtered field
+           fhp : double,  High pass filter ( as I-F )
+
+          Note : field is not modified, fct has the same dimension
+          ----
+
+    """   
+    
+    # %%
+    if fnam == None: 
+        fnam = ""
+    else:
+        fnam += " "
+
+    ratio= int(hres/lres)
+    flt_sigma = (scal*ratio, scal*ratio)
+    flp = np.zeros_like(field)
+
+    print("Spatial filtering " + fnam)
+    flp = scipy.ndimage.gaussian_filter(field, sigma=flt_sigma, mode='constant', axes=(-2,-1))
+    
+    # Set bottom boundary contition 
+    if field.ndim == 4:
+        flp[..., -1, :, :] = 0.
+   
+    fhp = field - flp 
+
+    return flp, fhp
+
+
 def SpatialFiltDown(hres, lres, scal, field, fnam=None):
     """   
 
@@ -74,25 +121,152 @@ def SpatialFiltDown(hres, lres, scal, field, fnam=None):
         fnam += " "
 
     ratio= int(hres/lres)
-    flt_sigma = scal*ratio
+    flt_sigma = (scal*ratio, scal*ratio)
 
-    print("Filtering and downsampling " + fnam)
-    flt = scipy.ndimage.gaussian_filter(field, sigma=flt_sigma, mode='constant')[..., ::ratio, ::ratio]
+    print("Downsampling filtered " + fnam)
+    fds = scipy.ndimage.gaussian_filter(field, sigma=flt_sigma, mode='constant', axes=(-2,-1))[..., ::ratio, ::ratio]
     
-    # Set bottom boundary contition 
-    if field.ndim == 4:
-        flt[..., -1, :, :] = 0.
-   
-    if field.ndim > 2:
-        print("0th-Axis averaging of " + fnam)
-        avg = np.mean(flt, axis=0)
-        fct = flt - avg
-    else:
-        print("Array " + fnam + "is two-dimensional in space, avg and fct will be zeros")
-        avg = np.zeros_like(flt)
-        fct = np.zeros_like(flt)
+    return fds
 
-    return flt, avg, fct
+class sp_filt:
+    
+    def __init__(self, nt, levs, hres, lres, scal, listofdicts ):
+        self.hres = hres
+        self.lres = lres
+        self.scal = scal
+        self.vars = []
+
+        self.nt = nt
+        self.levs = levs
+
+        for dict in listofdicts:
+            key = next(iter(dict))
+            print("Processing " + key)
+            #
+            # Filter High resolution in space
+            vel_hlp, vel_hhp = SpatialFiltering(hres, lres, scal, np.squeeze(dict[key]), key + "vel")
+            #
+            # Filter another time and downsample
+            vel_flt = SpatialFiltDown(hres, lres, scal, vel_hlp, "low passed high resolution " + key + "vel")
+            vel_fhp = SpatialFiltDown(hres, lres, 2*scal, vel_hhp, "high passed high resolution " + key + "vel")
+
+            vel_avg = np.mean(vel_flt, axis=0)
+            vel_ds = SpatialDownsample(hres, lres, np.squeeze(dict[key]), key + "vel")
+
+            # Define filtered field
+            tempdict = {}
+            tempdict["data"] = vel_flt
+            tempdict["name"] = key + "flt" 
+            tempdict["shape"] = tempdict["data"].shape
+            tempdict["units"] = "m/s"
+            tempdict["longname"] = "Filtered and downsampled " + key.upper() + " velocity"
+            setattr(self, key+"flt", tempdict)
+            self.vars.append(key+"flt")
+
+            # Define averaged filtered field
+            tempdict = {}
+            tempdict["data"] = vel_avg
+            tempdict["name"] = key + "avg_ds" 
+            tempdict["shape"] = tempdict["data"].shape
+            tempdict["units"] = "m/s"
+            tempdict["longname"] = "Temporal average of filtered " + key.upper() + " velocity " + key + "flt"
+            setattr(self, key+"avg_ds", tempdict)
+            self.vars.append(key+"avg_ds")
+
+            # Define fluctuations field
+            tempdict = {}
+            tempdict["data"] = vel_fhp - np.mean(vel_fhp, axis=0)
+
+            tempdict["name"] = key + "fct" 
+            tempdict["shape"] = tempdict["data"].shape
+            tempdict["units"] = "m/s"
+            tempdict["longname"] = "Temporal fluctuations of filtered " + key.upper() + " velocity " + key + "flt"
+            setattr(self, key+"fct", tempdict)
+            self.vars.append(key+"fct")
+
+            # Define downsampled field
+            tempdict = {}
+            tempdict["data"] = vel_ds
+            tempdict["name"] = key + "_ds" 
+            tempdict["shape"] = tempdict["data"].shape
+            tempdict["units"] = "m/s"
+            tempdict["longname"] = "Downsampled " + key.upper() + " velocity (no filter)"
+            setattr(self, key+"_ds", tempdict)
+            self.vars.append(key+"_ds")
+
+            # Define high-passed field
+            tempdict = {}
+            tempdict["data"] = vel_fhp
+            tempdict["name"] = key + "_hp" 
+            tempdict["shape"] = tempdict["data"].shape
+            tempdict["units"] = "m/s"
+            tempdict["longname"] = "Filtered high passed " + key.upper() + " velocity ( " + key + "vel - F(" + key + "vel) )"
+            setattr(self, key+"_hp", tempdict)
+            self.vars.append(key+"_hp")
+
+
+
+    def SpatialNetCDFSaveOut(self, outfile):
+
+        print("Writing filtered field in file: ", outfile)
+
+        fout = Dataset(outfile, "w", format="NETCDF4")
+   
+
+        nx = 30*self.lres + 2
+        ny = 20*self.lres + 2
+        nz = self.levs
+        nt = self.nt
+
+        # Create dimensions
+        fout.createDimension("scalar", 0)
+        fout.createDimension("t", nt)
+        fout.createDimension("x", nx)
+        fout.createDimension("y", ny)
+        fout.createDimension("z", nz)
+
+        dims = ("scalar",)
+        hres = fout.createVariable("hres", "i4", dims)
+        hres.units = "1/degrees"
+        hres.long_name = "High resolution factor"
+        hres = self.hres
+        
+        lres = fout.createVariable("lres", "i4", dims)
+        lres.units = "1/degrees"
+        lres.long_name = "Low resolution factor"
+        lres = self.lres
+
+        scal = fout.createVariable("scal", "i4", dims)
+        scal.long_name = "Resolution ratio scale: sigma=scal*Hres/Lres"
+        scal = self.scal
+
+        for var in self.vars:
+            var_dict = getattr(self, var)
+
+            if var_dict["data"].ndim == 3: 
+                # Check if last variable is nz
+                if var_dict["data"].shape[0] == nz: 
+                    dims = ("z", "y", "x",)
+                    tmp = np.zeros([nz, ny, nx])
+                # Check if last variable is nt
+                if var_dict["data"].shape[0] == nt: 
+                    dims = ("t", "y", "x",)
+                    tmp = np.zeros([nt, ny, nx])
+
+
+            if var_dict["data"].ndim == 4: 
+                dims = ("t", "z", "y", "x",)
+                tmp = np.zeros([nt, nz, ny, nx])
+
+            var_id = fout.createVariable(var, "f4", dims)
+            var_id.units = var_dict["units"]
+            var_id.long_name = var_dict["longname"]
+
+            tmp[...,1:-1,1:-1] = var_dict["data"] 
+            if var_dict["data"].ndim == 3: var_id[:,:,:] = tmp  
+            if var_dict["data"].ndim == 4: var_id[:,:,:,:] = tmp  
+
+        fout.close()
 
 
 
@@ -128,39 +302,38 @@ def TemporalFiltering(fcut, fs, field):
 
     return flt, fct
 
-
-
-
-class sp_filt:
+class tm_filt:
     
-    nx = None
-    ny = None
-    nz = None
-    nt = None
-
-    ddim = 0
-    
-    
-    def __init__(self, nt, levs, hres, lres, scal, listofdicts ):
+    def __init__(self, nt, levs, hres, lres, scal, fcut, fs, listofdicts, HighPass=False):
         self.hres = hres
         self.lres = lres
         self.scal = scal
+        self.fcut = fcut
+        self.fs = fs
         self.vars = []
 
         self.nt = nt
         self.levs = levs
+        self.HighPass = HighPass
 
         for dict in listofdicts:
             key = next(iter(dict))
             print("Processing " + key)
+            
+            # Temporal filtering
+            vel_hlp, vel_hhp = TemporalFiltering(fcut, fs, np.squeeze(dict[key]))
 
-            vel_flt, avg_ds, vel_fct = SpatialFiltDown(hres, lres, scal, np.squeeze(dict[key]), key + "vel")
+            vel_lp = SpatialFiltDown(hres, lres, scal, vel_hlp, key + "vel")
+            vel_hp = SpatialFiltDown(hres, lres, scal, vel_hhp, key + "vel")
+
             vel_ds = SpatialDownsample(hres, lres, np.squeeze(dict[key]), key + "vel")
-            vel_hp = vel_ds - vel_flt
+            avg_ds = np.mean(vel_lp, axis=0)
+            vel_fct = vel_lp - avg_ds
+
 
             # Define filtered field
             tempdict = {}
-            tempdict["data"] = vel_flt
+            tempdict["data"] = vel_lp
             tempdict["name"] = key + "flt" 
             tempdict["shape"] = tempdict["data"].shape
             tempdict["units"] = "m/s"
@@ -216,7 +389,6 @@ class sp_filt:
 
         fout = Dataset(outfile, "w", format="NETCDF4")
    
-
         nx = 30*self.lres + 2
         ny = 20*self.lres + 2
         nz = self.levs
@@ -228,6 +400,26 @@ class sp_filt:
         fout.createDimension("x", nx)
         fout.createDimension("y", ny)
         fout.createDimension("z", nz)
+
+        dims = ("scalar",)
+        hres = fout.createVariable("hres", "i4", dims)
+        hres.units = "1/degrees"
+        hres.long_name = "High resolution factor"
+        hres = self.hres
+        
+        lres = fout.createVariable("lres", "i4", dims)
+        lres.units = "1/degrees"
+        lres.long_name = "Low resolution factor"
+        lres = self.lres
+
+        scal = fout.createVariable("scal", "i4", dims)
+        scal.long_name = "Resolution ratio scale: sigma=scal*Hres/Lres"
+        scal = self.scal
+
+        fcut = fout.createVariable("fcut", "i4", dims)
+        fcut.units = "1/s"
+        fcut.long_name = "Cut frequency"
+        fcut = self.fcut
 
         for var in self.vars:
             var_dict = getattr(self, var)
@@ -249,10 +441,12 @@ class sp_filt:
 
             var_id = fout.createVariable(var, "f4", dims)
             var_id.units = var_dict["units"]
-            var_id.long_name = ["longname"]
+            var_id.long_name = var_dict["longname"]
 
             tmp[...,1:-1,1:-1] = var_dict["data"] 
             if var_dict["data"].ndim == 3: var_id[:,:,:] = tmp  
             if var_dict["data"].ndim == 4: var_id[:,:,:,:] = tmp  
 
         fout.close()
+
+
