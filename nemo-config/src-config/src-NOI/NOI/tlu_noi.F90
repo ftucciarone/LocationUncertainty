@@ -136,7 +136,7 @@ CONTAINS
       IF ( ln_tlu_gss ) CALL tlu_init_gss ! White Gaussian noise
       !
       CALL tlu_arrays_init( nit000 )
-      IF ( dt_delay .ne. 0 ) ln_tlu = .false.
+      IF ( dt_delay .ne. 0 ) ld_tlu = .false.
       !
    END SUBROUTINE tlu_noi_init
    ! [tlu_noi_init]
