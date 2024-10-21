@@ -1,1 +1,1 @@
-# This folder contains the specifics for each simulation fo the paper
+# This folder contains the specifics for each simulation described in the paper
