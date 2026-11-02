@@ -1,0 +1,94 @@
+---
+work_dir : ""
+data_dir : /ithaca/these-results
+dom_dir : /ithaca/nemo-base/base-config/domain-config
+out_dir : /ithaca/these-results/data_R3/figures
+
+grid2plt : 'T'
+ext : '.nc'
+
+HRexps:
+  R27d:
+    name : R27d
+    label : R27d
+    base_dir : /../nemo-results/data_R27
+    subs_dir : 
+      - /100-102y 
+      - /102-104y
+      - /104-106y
+      - /106-108y
+      - /108-110y
+    curlfile : curl_T
+    tempfile : GYRE_5d_00010101_00021230_grid_T
+    uvelfile : GYRE_5d_00010101_00021230_grid_U
+    vvelfile : GYRE_5d_00010101_00021230_grid_V
+    wvelfile : GYRE_5d_00010101_00021230_grid_W
+    color : tab:blue
+
+LRexps:
+  R3dt:
+    name : R3dt
+    label : R3d
+    base_dir : /data_R3/R3_det
+    subs_dir : 
+      - /FULL
+    curlfile : GYRE_det_5d_00010101_00151230_grid_T
+    tempfile : GYRE_det_5d_00010101_00151230_grid_T
+    uvelfile : GYRE_det_5d_00010101_00151230_grid_U
+    vvelfile : GYRE_det_5d_00010101_00151230_grid_V
+    wvelfile : GYRE_det_5d_00010101_00151230_grid_W
+    color : tab:orange
+    bias : False
+  R3pod:
+    name : R3pod
+    label : POD(u)
+    base_dir : /data_R3/R3_pod
+    subs_dir : 
+      - /FULL
+    curlfile : GYRE_pod_5d_00010101_00151230_grid_T
+    tempfile : GYRE_pod_5d_00010101_00151230_grid_T
+    uvelfile : GYRE_pod_5d_00010101_00151230_grid_U
+    vvelfile : GYRE_pod_5d_00010101_00151230_grid_V
+    wvelfile : GYRE_pod_5d_00010101_00151230_grid_W
+    color : tab:green
+    bias : True
+  R3dmd:
+    name : R3dmd
+    label : DMD($u$)
+    base_dir : /data_R3/R3_dmd
+    subs_dir : 
+      - /FULL
+    curlfile : GYRE_dmd_5d_00010101_00151230_grid_T
+    tempfile : GYRE_dmd_5d_00010101_00151230_grid_T
+    uvelfile : GYRE_dmd_5d_00010101_00151230_grid_U
+    vvelfile : GYRE_dmd_5d_00010101_00151230_grid_V
+    wvelfile : GYRE_dmd_5d_00010101_00151230_grid_W
+    color : tab:red
+    bias : True
+  R3gss:
+    name : R3gss
+    label : VPP
+    base_dir : /../JAMES/cfgs/R3_gss #/data_R3/R3_gss
+    subs_dir : 
+      - /FULL
+    curlfile : GYRE_gss_5d_00010101_00151230_grid_T
+    tempfile : GYRE_gss_5d_00010101_00151230_grid_T
+    uvelfile : GYRE_gss_5d_00010101_00151230_grid_U
+    vvelfile : GYRE_gss_5d_00010101_00151230_grid_V
+    wvelfile : GYRE_gss_5d_00010101_00151230_grid_W
+    color : tab:purple
+    bias: False
+  R3sss:
+    name : R3ssh
+    label : DMD($\eta$) #+ $G\ast$dB($x$)
+    base_dir : /../JAMES/cfgs/R3_ssh/FULL #/data_R3/R3_ssh
+    subs_dir : 
+      - /
+    curlfile : GYRE_ssh_5d_00010101_00151230_grid_T
+    tempfile : GYRE_ssh_5d_00010101_00151230_grid_T
+    uvelfile : GYRE_ssh_5d_00010101_00151230_grid_U
+    vvelfile : GYRE_ssh_5d_00010101_00151230_grid_V
+    wvelfile : GYRE_ssh_5d_00010101_00151230_grid_W
+    color : tab:brown
+    bias : True
+

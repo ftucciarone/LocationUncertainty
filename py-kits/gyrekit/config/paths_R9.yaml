@@ -1,0 +1,54 @@
+---
+work_dir : ""
+data_dir : /ithaca/nemo-results
+dom_dir : /ithaca/nemo-base/base-config/domain-config
+out_dir : /ithaca/analysis-results/
+
+grid2plt : 'T'
+ext : '.nc'
+
+HRexps:
+  R27d:
+    name : R27d
+    label : R27d
+    base_dir : /data_R27
+    subs_dir : 
+      - /100-102y 
+      - /102-104y
+      - /104-106y
+      - /106-108y
+      - /108-110y
+    curlfile : curl_T
+    tempfile : GYRE_5d_00010101_00021230_grid_T
+    uvelfile : GYRE_5d_00010101_00021230_grid_U
+    vvelfile : GYRE_5d_00010101_00021230_grid_V
+    wvelfile : GYRE_5d_00010101_00021230_grid_W
+    color : tab:blue
+
+LRexps:
+  R9dt:
+    name : R9dt
+    label : R9d
+    base_dir : /R9_wlt
+    subs_dir : 
+      - /EXP00
+    curlfile : GYRE_dt_5d_01110101_01211230_grid_T
+    tempfile : GYRE_dt_5d_01110101_01211230_grid_T
+    uvelfile : GYRE_dt_5d_01110101_01211230_grid_U
+    vvelfile : GYRE_dt_5d_01110101_01211230_grid_V
+    wvelfile : GYRE_dt_5d_01110101_01211230_grid_W
+    color : tab:orange
+    bias : False
+  R9gss:
+    name : R9gss
+    label : wlt(u)
+    base_dir : /R9_wlt
+    subs_dir : 
+      - /EXP00
+    curlfile : GYRE_lu_5d_01110101_01211230_grid_T
+    tempfile : GYRE_lu_5d_01110101_01211230_grid_T
+    uvelfile : GYRE_lu_5d_01110101_01211230_grid_U
+    vvelfile : GYRE_lu_5d_01110101_01211230_grid_V
+    wvelfile : GYRE_lu_5d_01110101_01211230_grid_W
+    color : tab:green
+    bias : False

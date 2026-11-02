@@ -1,0 +1,8 @@
+# Copy to paths.toml, which git ignores, and set your own locations.
+glorys04 = "/path/to/glorys04"          # holds static/, daily/, daily-baroclinic/
+glorys12 = "/path/to/glorys12"          # holds static/, monthly/
+cmems = "/path/to/cmems"                # holds static/ and one folder per variable
+domain_orca1 = "/path/to/domain_cfg.nc" # eORCA1 domain file
+gyre_root = "/path/to/gyre"             # folder that the paths in gyrekit/config start from
+outputs = "/path/to/outputs"            # default output folder of the pipelines
+nemo_src = "/path/to/nemo-5.0.2:/path/to/nemo-4.2.2"   # NEMO git clones at release tags, ":"-separated; docs/make_html.py quotes the newest with the line

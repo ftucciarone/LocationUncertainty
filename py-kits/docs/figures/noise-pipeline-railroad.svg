@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="928" viewBox="0 0 1060 928"><rect width="100%" height="100%" fill="#ffffff"/><path d="M20 50L1000 50M290 50L290 50Q300 50 300 60L300 84Q300 94 310 94L760 94M572 94L582 94Q592 94 592 104L592 128Q592 138 602 138L602 138Q612 138 622 138L715 138Q725 138 735 138L735 138Q745 138 745 128L745 104Q745 94 755 94L760 94M300 84L300 172Q300 182 310 182L715 182Q725 182 735 182L735 182Q745 182 745 172L745 104Q745 94 755 94L760 94M976 94L990 94M50 50L50 50Q60 50 60 60L60 216Q60 226 70 226L70 226Q80 226 90 226L970 226Q980 226 990 226L990 226Q1000 226 1000 216L1000 60Q1000 50 1010 50L1010 50M50 50L50 50Q60 50 60 60L60 304Q60 314 70 314L70 314Q80 314 90 314L970 314Q980 314 990 314L990 314Q1000 314 1000 304L1000 60Q1000 50 1010 50L1010 50M50 50L50 50Q60 50 60 60L60 348Q60 358 70 358L70 358Q80 358 90 358L970 358Q980 358 990 358L990 358Q1000 358 1000 348L1000 60Q1000 50 1010 50L1010 50M290 226L290 226Q300 226 300 236L300 260Q300 270 310 270L760 270M976 270L990 270M1000 50L1030 50Q1040 50 1040 60L1040 390Q1040 400 1030 400L30 400Q20 400 20 410L20 440Q20 450 30 450L1000 450M50 450L50 450Q60 450 60 460L60 484Q60 494 70 494L70 494Q80 494 90 494L970 494Q980 494 990 494L990 494Q1000 494 1000 484L1000 460Q1000 450 1010 450L1010 450M1000 450L1030 450Q1040 450 1040 460L1040 526Q1040 536 1030 536L30 536Q20 536 20 546L20 576Q20 586 30 586L1000 586M270 586L270 586Q280 586 280 596L280 620Q280 630 290 630L290 630Q300 630 310 630L450 630Q460 630 470 630L470 630Q480 630 480 620L480 596Q480 586 490 586L490 586M50 586L50 586Q60 586 60 596L60 664Q60 674 70 674L70 674Q80 674 90 674L970 674Q980 674 990 674L990 674Q1000 674 1000 664L1000 596Q1000 586 1010 586L1010 586M50 586L50 586Q60 586 60 596L60 708Q60 718 70 718L70 718Q80 718 90 718L970 718Q980 718 990 718L990 718Q1000 718 1000 708L1000 596Q1000 586 1010 586L1010 586M50 586L50 586Q60 586 60 596L60 752Q60 762 70 762L70 762Q80 762 90 762L970 762Q980 762 990 762L990 762Q1000 762 1000 752L1000 596Q1000 586 1010 586L1010 586M1000 586L1030 586Q1040 586 1040 596L1040 794Q1040 804 1030 804L30 804Q20 804 20 814L20 844Q20 854 30 854L420 854M50 854L50 854Q60 854 60 864L60 888Q60 898 70 898L70 898Q80 898 90 898L320 898Q330 898 340 898L340 898Q350 898 350 888L350 864Q350 854 360 854L360 854M548 854L562 854" fill="none" stroke="#333333" stroke-width="2"/><path d="M20 40V60" stroke="#333333" stroke-width="3"/>
+<path d="M990 84V104" stroke="#333333" stroke-width="3"/>
+<path d="M990 260V280" stroke="#333333" stroke-width="3"/>
+<path d="M562 844V864" stroke="#333333" stroke-width="3"/>
+<text x="60" y="29" font-family="monospace" font-size="13" text-anchor="start" fill="#111111" font-weight="bold">Stage 0: source</text>
+<rect x="80" y="37" width="192" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="176.0" y="55" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">raw u, v: V1 V2 D1 D2</text>
+<rect x="320" y="81" width="232" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="436.0" y="99" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">PP1 barotropic, baroclinic</text>
+<rect x="612" y="125" width="168" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="696.0" y="143" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">PP4 spatial filter</text>
+<rect x="320" y="169" width="192" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="416.0" y="187" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">PP2 w from divergence</text>
+<rect x="760" y="81" width="216" height="26" rx="2" fill="#fdf1dc" stroke="#333333" stroke-width="1.5"/>
+<text x="868.0" y="99" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">new source, preprocessed</text>
+<rect x="80" y="213" width="184" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="172.0" y="231" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">raw surface, SSH: V3</text>
+<rect x="80" y="301" width="224" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="192.0" y="319" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">raw vertical velocity: W1</text>
+<rect x="80" y="345" width="272" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="216.0" y="363" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">preprocessed field: V4 V5 W1 S1</text>
+<rect x="320" y="257" width="184" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="412.0" y="275" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">PP3 geostrophic u, v</text>
+<rect x="760" y="257" width="216" height="26" rx="2" fill="#fdf1dc" stroke="#333333" stroke-width="1.5"/>
+<text x="868.0" y="275" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">new source, preprocessed</text>
+<text x="60" y="429" font-family="monospace" font-size="13" text-anchor="start" fill="#111111" font-weight="bold">Conditioning: optional</text>
+<rect x="80" y="481" width="296" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="228.0" y="499" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">smooth, coastal taper: V2 D1 D2 W1</text>
+<text x="60" y="565" font-family="monospace" font-size="13" text-anchor="start" fill="#111111" font-weight="bold">B1: noise quantity</text>
+<rect x="80" y="573" width="160" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="160.0" y="591" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">statistics: V1-V5</text>
+<rect x="300" y="617" width="144" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="372.0" y="635" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">low-pass: V3 V4</text>
+<rect x="80" y="661" width="152" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="156.0" y="679" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">length scale: V5</text>
+<rect x="80" y="705" width="208" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="184.0" y="723" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">running variance: D1 D2</text>
+<rect x="310" y="705" width="160" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="390.0" y="723" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">DMD or kernel DMD</text>
+<rect x="80" y="749" width="104" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="132.0" y="767" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">DMD: W1 S1</text>
+<text x="60" y="833" font-family="monospace" font-size="13" text-anchor="start" fill="#111111" font-weight="bold">B2: sampling</text>
+<text x="420" y="833" font-family="monospace" font-size="13" text-anchor="start" fill="#111111" font-weight="bold">B3</text>
+<rect x="80" y="841" width="72" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="116.0" y="859" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">eORCA1</text>
+<rect x="80" y="885" width="128" height="26" rx="10" fill="#f2f2f2" stroke="#333333" stroke-width="1.5" stroke-dasharray="5 3"/>
+<text x="144.0" y="903" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">Med (planned)</text>
+<rect x="420" y="841" width="128" height="26" rx="10" fill="#e8f1f8" stroke="#333333" stroke-width="1.5"/>
+<text x="484.0" y="859" font-family="monospace" font-size="13" text-anchor="middle" fill="#111111" font-weight="normal">file for NEMO</text></svg>
