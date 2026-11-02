@@ -5,7 +5,7 @@
 !!   equations.
 !
 !> @authors
-!>                P. Derian, P. Chandramouli, F. Tucciarone
+!>                P. Derian, P. Chandramouli, F.L. Tucciarone
 !!
 !> @version
 !!                2017 -  ( P. DERIAN       )  Original code <br>
@@ -65,7 +65,7 @@ CONTAINS
    !!            ***  ROUTINE tlu_zadv_noi ***
    !!
    !> @authors
-   !>                P. Derian, P. Chandramouli, F. Tucciarone
+   !>                P. Derian, P. Chandramouli, F.L. Tucciarone
    !!
    !> @version
    !!                2017 -  ( P. DERIAN       )  Original code <br>
@@ -170,7 +170,7 @@ CONTAINS
    !!            ***  ROUTINE tlu_zzdiff ***
    !!
    !> @authors
-   !>                P. Derian, P. Chandramouli, F. Tucciarone
+   !>                P. Derian, P. Chandramouli, F.L. Tucciarone
    !!
    !> @version
    !!                2017 -  ( P. DERIAN       )  Original code <br>
@@ -358,7 +358,7 @@ CONTAINS
    !!            ***  ROUTINE tlu_zzdrift ***
    !!
    !> @authors
-   !>                P. Derian, P. Chandramouli, F. Tucciarone
+   !>                P. Derian, P. Chandramouli, F.L. Tucciarone
    !!
    !> @version
    !!                2017 -  ( P. DERIAN       )  Original code <br>

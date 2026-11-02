@@ -13,7 +13,7 @@ model is here yet.
 - [ ] Writes provenance into its output (`datakit.provenance`).
 - [ ] Writes the file NEMO reads under the names the Fortran expects.
 - [ ] Is documented: idea, formulas, code, discretisation, run, output, status.
-- [ ] Is validated: its results look good to F. Tucciarone.
+- [ ] Is validated: its results look good to F.L. Tucciarone.
 
 Fields it computes on the way are written with `datakit.write_field`, so they read back as a source.
 

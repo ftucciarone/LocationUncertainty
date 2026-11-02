@@ -103,7 +103,7 @@ CONTAINS
  
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> L.Li, F. Tucciarone 
+   !!> L.Li, F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
@@ -197,7 +197,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> L.Li, F. Tucciarone 
+   !!> L.Li, F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  

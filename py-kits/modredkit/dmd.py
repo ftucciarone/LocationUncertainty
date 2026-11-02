@@ -4,7 +4,7 @@
 Dynamic mode decomposition: exact, kernel and windowed multi-level DMD, with amplitudes, eigenvalue
 filters, reshaping helpers and plots.
 
-Written by F. Tucciarone, 2023. Taken from the classDMD module of the earlier model-reduction code
+Written by F.L. Tucciarone, 2023. Taken from the classDMD module of the earlier model-reduction code
 (2026-09-06) and renamed dmd.py -- it is a module of functions, not a class.
 
 Working / used by the kDMD notebooks:

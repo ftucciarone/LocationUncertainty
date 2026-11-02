@@ -5,7 +5,7 @@
 !!   equations.
 !
 !> @authors
-!>                P. Derian, P. Chandramouli, F. Tucciarone
+!>                P. Derian, P. Chandramouli, F.L. Tucciarone
 !!
 !> @version
 !!                2017 -  ( P. DERIAN       )  Original code <br>
@@ -127,7 +127,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> P. Derian, P. Chandramouli, F. Tucciarone 
+   !!> P. Derian, P. Chandramouli, F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  

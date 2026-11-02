@@ -6,7 +6,7 @@
 !!   
 !
 !> @authors
-!>                F. Tucciarone
+!>                F.L. Tucciarone
 !!
 !> @version
 !!                2021 -  ( F. TUCCIARONE   )  .F90 original code <br>
@@ -36,7 +36,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> F. Tucciarone 
+   !!> F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
@@ -67,7 +67,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> F. Tucciarone 
+   !!> F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  

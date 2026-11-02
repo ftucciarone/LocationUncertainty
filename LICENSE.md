@@ -16,7 +16,7 @@ Contributors add their name to the copyright line below.
 
 MIT License
 
-Copyright (c) 2026 F. Tucciarone and contributors
+Copyright (c) 2026 F.L. Tucciarone and contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 associated documentation files (the "Software"), to deal in the Software without restriction,

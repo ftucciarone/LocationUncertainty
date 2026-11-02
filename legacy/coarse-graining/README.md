@@ -2,7 +2,7 @@
 
 Standalone tool that filters high-resolution GYRE velocities (R27) and coarse-grains them (R3), with the fields for LU noise. Not built or tested here.
 
-**Authors:** F. Tucciarone and L. Li. It is a complete reshaping by F. Tucciarone of L. Li's original code (2020, f77).
+**Authors:** F.L. Tucciarone and L. Li. It is a complete reshaping by F.L. Tucciarone of L. Li's original code (2020, f77).
 
 ## `srcF90/`
 From `crsgrain-base`, the later version: two filter widths (band), difference of Gaussians, time-mean removal, command-line options (`-w1`, `-w2`, `-units`, `-baroclinic`, `-timeavgrem`), SSH, and separate high- and low-resolution output. A run of this version finished normally over 690 snapshots.

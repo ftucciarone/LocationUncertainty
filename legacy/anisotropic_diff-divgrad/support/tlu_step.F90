@@ -5,7 +5,7 @@
 !!   equations.
 !
 !> @authors
-!>                P. Derian, P. Chandramouli, F. Tucciarone
+!>                P. Derian, P. Chandramouli, F.L. Tucciarone
 !!
 !> @version
 !!                2017 -  ( P. DERIAN       )  Original code <br>
@@ -93,7 +93,7 @@ CONTAINS
    !!            ***  ROUTINE tlu_bcdyn ***
    !!
    !> @authors
-   !>                P. Derian, P. Chandramouli, F. Tucciarone
+   !>                P. Derian, P. Chandramouli, F.L. Tucciarone
    !!
    !> @version
    !!                2021 -  ( F. TUCCIARONE   )  Original code and documentation
@@ -214,7 +214,7 @@ CONTAINS
    !!            ***  ROUTINE tlu_tradyn ***
    !!
    !> @authors
-   !>                P. Derian, P. Chandramouli, F. Tucciarone
+   !>                P. Derian, P. Chandramouli, F.L. Tucciarone
    !!
    !> @version
    !!                2021 -  ( F. TUCCIARONE   )  Original code and documentation

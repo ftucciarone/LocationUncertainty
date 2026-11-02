@@ -118,7 +118,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> F. Tucciarone 
+   !!> F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
@@ -156,7 +156,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> F. Tucciarone 
+   !!> F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
@@ -197,7 +197,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> F. Tucciarone 
+   !!> F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
@@ -239,7 +239,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> F. Tucciarone 
+   !!> F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
@@ -279,7 +279,7 @@ CONTAINS
    END SUBROUTINE read2D_REALvar
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> F. Tucciarone 
+   !!> F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
@@ -342,7 +342,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> F. Tucciarone 
+   !!> F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
@@ -403,7 +403,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> F. Tucciarone 
+   !!> F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
@@ -465,7 +465,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> F. Tucciarone 
+   !!> F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
@@ -535,7 +535,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> F. Tucciarone 
+   !!> F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
@@ -609,7 +609,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> F. Tucciarone 
+   !!> F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
@@ -686,7 +686,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> L.Li, F. Tucciarone 
+   !!> L.Li, F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
@@ -752,7 +752,7 @@ CONTAINS
 
    !!---------------------------------------------------------------------------  
    !!> @author 
-   !!> L.Li, F. Tucciarone 
+   !!> L.Li, F.L. Tucciarone 
    !!
    !!  DESCRIPTION: 
    !!  
