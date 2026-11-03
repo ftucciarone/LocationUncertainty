@@ -9,6 +9,7 @@ This branch is the latest working version. It is being rebuilt: the Python tools
 | `preprocessing/` | Steps PP1 to PP7 that turn reanalysis data into the fields the noise is built from |
 | `noise-models/` | The noise models under test, with the rules a model must follow; empty for now |
 | `legacy/` | Routines no longer used, kept because they would be costly to rewrite |
+| `intro/` | The location uncertainty principle (thesis Ch. 2) as a web page, under review: <https://ftucciarone.github.io/LocationUncertainty/intro/location-uncertainty.html> |
 
 ## Branches
 - `main`: latest working version.

@@ -12,7 +12,7 @@ To build, set the netCDF install folder: `make NCBASE=/path/to/netcdf/installs`.
 ## `srcPY/`
 EOF, curl and divergence-free scripts from the old `develop` branch, commit `9cc82cc`. Their absolute paths were emptied, so set `base_dir` and the file names before running. `modredkit/pod.py` supersedes `snapshot_POD.py`.
 
-The earlier Fortran (2022) is in tag `archive-develop-2022`.
+The earlier Fortran (2022) is in tag `develop-2022`.
 
 ## Check before reuse
 - `main.F90` builds input paths with `indir(1:25)`, so it only works with a directory prefix of exactly that length.
